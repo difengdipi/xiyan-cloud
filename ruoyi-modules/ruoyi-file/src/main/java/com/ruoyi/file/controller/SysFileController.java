@@ -11,6 +11,8 @@ import com.ruoyi.common.core.utils.file.FileUtils;
 import com.ruoyi.file.service.ISysFileService;
 import com.ruoyi.system.api.domain.SysFile;
 
+import javax.annotation.Resource;
+
 /**
  * 文件请求处理
  * 
@@ -21,7 +23,7 @@ public class SysFileController
 {
     private static final Logger log = LoggerFactory.getLogger(SysFileController.class);
 
-    @Autowired
+    @Resource
     private ISysFileService sysFileService;
 
     /**
