@@ -1,0 +1,131 @@
+package com.ruoyi.shop.controller.goods;
+
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.utils.bean.BeanUtils;
+import com.ruoyi.shop.domain.goods.Goods;
+import com.ruoyi.shop.domain.goods.GoodsBrand;
+import com.ruoyi.shop.domain.goods.GoodsParticulars;
+import com.ruoyi.shop.domain.goods.GoodsParticularsVo;
+import com.ruoyi.shop.service.goods.GoodsBrandService;
+import com.ruoyi.shop.service.goods.GoodsParticularsService;
+import com.ruoyi.shop.service.goods.GoodsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping(value = "/goods/")
+@Tag(name = "显示商品")
+public class GoodsController {
+    @Autowired
+    private GoodsService goodsService;
+    @Autowired
+    private GoodsParticularsService goodsParticularsService;
+    @Autowired
+    private GoodsBrandService goodsBrandService;
+
+    @Operation(summary = "获得所有的商品")
+    @GetMapping(value = "/getAllGoods")
+    public R getAllGoods() {
+        List<Goods> goods = goodsService.list();
+        return R.ok(goods);
+    }
+
+    @Operation(summary = "猜你喜欢商品带分页")
+    @GetMapping(value = "/guessLikeGoods")
+    public R guessLikeGoods(@RequestParam(name = "page", defaultValue = "1") Long page,
+                            @RequestParam(name = "pageSize", defaultValue = "10") Long pageSize) {
+        //分页功能进行查询
+        Page< Goods > goodsPage = new Page<>(page, pageSize);
+        //条件构造器
+        QueryWrapper< Goods > queryWrapper = new QueryWrapper<>();
+        //随机排序
+        queryWrapper.orderByDesc("rand()");
+        //查询数据
+        goodsService.page(goodsPage, queryWrapper);
+        //每页的数据集合
+        List< Goods > goodsList = goodsPage.getRecords();
+        //总的记录数
+        Long counts = goodsPage.getTotal();
+        //每页条数
+        pageSize = goodsPage.getSize();
+        //总页数
+        Long pages = goodsPage.getPages();
+        //当前页数
+        page = goodsPage.getCurrent();
+        Map< String, Object > map = new HashMap<>();
+        map.put("counts", counts);
+        map.put("pageSize", pageSize);
+        map.put("pages", pages);
+        map.put("page", page);
+        map.put("goodsList", goodsList);
+        return R.ok(map);
+    }
+
+    @Operation(summary = "增加商品")
+    @PostMapping(value = "/addGoods")
+    public R addGoods(@RequestBody Goods goods) {
+        boolean flag = goodsService.save(goods);
+        if (flag) {
+            return R.ok("增加商品成功");
+        } else {
+            return R.fail("增加商品失败");
+        }
+    }
+
+    @Operation(summary = "删除商品数据")
+    @DeleteMapping(value = "/deleteGoods/{id}")
+    public R deleteGoods(@PathVariable("id") Integer goodsId) {
+        boolean flag = goodsService.removeById(goodsId);
+        if (flag) {
+            return R.ok("删除商品成功");
+        } else {
+            return R.fail("删除商品失败");
+        }
+    }
+
+    @Operation(summary = "按照商品编号查询数据")
+    @GetMapping(value = "/getGoodsById/{id}")
+    public R getGoodsById(@PathVariable("id") Integer goodsId) {
+        Goods goods = goodsService.getById(goodsId);
+        return R.ok( goods);
+    }
+
+    @Operation(summary = "按照商品详情编号联表查询数据")
+    @GetMapping(value = "/getGoodsById")
+    public R getGoodsByIds(@RequestParam("goodsId") Integer goodsId) {
+        List<GoodsParticularsVo> goodsParticularsVoList = new ArrayList<>();
+        GoodsParticulars goodsParticulars = goodsParticularsService.getById(goodsId);
+        Goods goods = goodsService.getById(goodsId);
+        GoodsBrand goodsBrand = goodsBrandService.getById(goodsParticulars.getBrandId());
+        GoodsParticularsVo goodsParticularsVo = new GoodsParticularsVo();
+        BeanUtils.copyProperties(goodsParticularsVo, goodsParticulars);
+        goodsParticularsVo.setGoodsId(goods.getGoodsId());
+        goodsParticularsVo.setGoodsName(goods.getGoodsName());
+        goodsParticularsVo.setGoodsDesc(goods.getGoodsDesc());
+        goodsParticularsVo.setGoodsPrice(goods.getGoodsPrice());
+        goodsParticularsVo.setGoodsBrand(goodsBrand);
+        goodsParticularsVoList.add(goodsParticularsVo);
+        return R.ok(goodsParticularsVoList);
+    }
+
+    @Operation(summary = "修改商品数据")
+    @PutMapping(value = "/updateGoods")
+    public R updateGoods(@RequestBody Goods goods) {
+        boolean flag = goodsService.updateById(goods);
+        if (flag) {
+            return R.ok("修改商品成功");
+        } else {
+            return R.fail("修改商品失败");
+        }
+    }
+}

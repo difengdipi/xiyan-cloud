@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import com.ruoyi.common.core.constant.SecurityConstants;
 import com.ruoyi.common.core.constant.UserConstants;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.utils.SpringUtils;
@@ -7,6 +8,7 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.bean.BeanValidators;
 import com.ruoyi.common.datascope.annotation.DataScope;
 import com.ruoyi.common.security.utils.SecurityUtils;
+import com.ruoyi.system.api.RemoteDentalService;
 import com.ruoyi.system.api.domain.SysRole;
 import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.domain.SysPost;
@@ -26,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -61,6 +64,9 @@ public class SysUserServiceImpl implements ISysUserService
 
     @Autowired
     protected Validator validator;
+
+    @Autowired
+    RemoteDentalService remoteDentalService;
 
     /**
      * 根据条件分页查询用户列表
@@ -249,6 +255,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 新增保存用户信息
+     *  TODO：新增用户时如果是新增医生，则需要创建医生信息表
      * 
      * @param user 用户信息
      * @return 结果
@@ -263,6 +270,20 @@ public class SysUserServiceImpl implements ISysUserService
         insertUserPost(user);
         // 新增用户与角色管理
         insertUserRole(user);
+        //新增用户与医生详情表关联
+        //异步调用
+        CompletableFuture.runAsync(() -> {
+            remoteDentalService.insertBySysUser(user, SecurityConstants.INNER);
+        }).whenComplete((v, e) -> {
+            if (v != null)
+            {
+                log.info("异步调用成功");
+            }
+            if (e != null)
+            {
+                log.error("异步调用失败", e);
+            }
+        });
         return rows;
     }
 

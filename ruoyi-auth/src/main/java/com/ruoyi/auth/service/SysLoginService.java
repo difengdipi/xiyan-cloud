@@ -215,6 +215,7 @@ public class SysLoginService
                     loginUserVO.setNickName(sysUser.getNickName());
                     loginUserVO.setPhonenumber(sysUser.getPhonenumber());
                     String token = (String) tokenService.createAppToekn(sysUser).get("access_token");
+                    System.out.println(token);
                     loginUserVO.setToken(token);
                 }
             }

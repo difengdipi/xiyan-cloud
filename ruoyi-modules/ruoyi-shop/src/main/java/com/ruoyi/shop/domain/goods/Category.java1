@@ -1,0 +1,18 @@
+package com.example.goods.pojo;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.ibatis.type.Alias;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName(value = "GoodsCategory", resultMap = "categoryMap")
+public class Category {
+    private Integer categoryId;
+    private String categoryName;
+    private Integer categoryLayer;
+    private Integer categoryParent;
+}

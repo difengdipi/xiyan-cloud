@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.dental.mapper.AppointmentsMapper">
+
+    <resultMap type="Appointments" id="AppointmentsResult">
+        <result property="appointmentId"    column="appointment_id"    />
+        <result property="patientId"    column="patient_id"    />
+        <result property="doctorId"    column="doctor_Id"    />
+        <result property="appointmentDate"    column="appointment_date"    />
+        <result property="notes"    column="notes"    />
+        <result property="chiefComplaint"    column="chief_complaint"    />
+        <result property="createdAt"    column="created_at"    />
+        <result property="updatedAt"    column="updated_at"    />
+    </resultMap>
+
+    <sql id="selectAppointmentsVo">
+        select appointment_id, patient_id, doctor_Id, appointment_date, notes, chief_complaint, created_at, updated_at from tb_appointments
+    </sql>
+
+    <select id="selectAppointmentsList" parameterType="Appointments" resultMap="AppointmentsResult">
+        <include refid="selectAppointmentsVo"/>
+        <where>
+            <if test="patientId != null "> and patient_id = #{patientId}</if>
+            <if test="doctorId != null  and doctorId != ''"> and doctor_Id = #{doctorId}</if>
+            <if test="appointmentDate != null "> and appointment_date = #{appointmentDate}</if>
+            <if test="chiefComplaint != null  and chiefComplaint != ''"> and chief_complaint = #{chiefComplaint}</if>
+            <if test="createdAt != null "> and created_at = #{createdAt}</if>
+            <if test="updatedAt != null "> and updated_at = #{updatedAt}</if>
+        </where>
+    </select>
+
+    <select id="selectAppointmentsByAppointmentId" parameterType="Long" resultMap="AppointmentsResult">
+        <include refid="selectAppointmentsVo"/>
+        where appointment_id = #{appointmentId}
+    </select>
+
+    <insert id="insertAppointments" parameterType="Appointments" useGeneratedKeys="true" keyProperty="appointmentId">
+        insert into tb_appointments
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="patientId != null">patient_id,</if>
+            <if test="doctorId != null and doctorId != ''">doctor_Id,</if>
+            <if test="appointmentDate != null">appointment_date,</if>
+            <if test="notes != null">notes,</if>
+            <if test="chiefComplaint != null">chief_complaint,</if>
+            <if test="createdAt != null">created_at,</if>
+            <if test="updatedAt != null">updated_at,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="patientId != null">#{patientId},</if>
+            <if test="doctorId != null and doctorId != ''">#{doctorId},</if>
+            <if test="appointmentDate != null">#{appointmentDate},</if>
+            <if test="notes != null">#{notes},</if>
+            <if test="chiefComplaint != null">#{chiefComplaint},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+            <if test="updatedAt != null">#{updatedAt},</if>
+        </trim>
+    </insert>
+
+    <update id="updateAppointments" parameterType="Appointments">
+        update tb_appointments
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="patientId != null">patient_id = #{patientId},</if>
+            <if test="doctorId != null and doctorId != ''">doctor_Id = #{doctorId},</if>
+            <if test="appointmentDate != null">appointment_date = #{appointmentDate},</if>
+            <if test="notes != null">notes = #{notes},</if>
+            <if test="chiefComplaint != null">chief_complaint = #{chiefComplaint},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </trim>
+        where appointment_id = #{appointmentId}
+    </update>
+
+    <delete id="deleteAppointmentsByAppointmentId" parameterType="Long">
+        delete from tb_appointments where appointment_id = #{appointmentId}
+    </delete>
+
+    <delete id="deleteAppointmentsByAppointmentIds" parameterType="String">
+        delete from tb_appointments where appointment_id in
+        <foreach item="appointmentId" collection="array" open="(" separator="," close=")">
+            #{appointmentId}
+        </foreach>
+    </delete>
+</mapper>

@@ -13,7 +13,8 @@
         <module>ruoyi-gen</module>
         <module>ruoyi-job</module>
         <module>ruoyi-file</module>
-        <module>ruoyi-category</module>
+        <module>ruoyi-shop</module>
+        <module>ruoyi-dental</module>
     </modules>
 
     <artifactId>ruoyi-modules</artifactId>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.dental.mapper.PatientsMapper">
+
+    <resultMap type="com.ruoyi.dental.domain.Patients" id="PatientsResult">
+        <result property="patientId"    column="patient_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="gender"    column="gender"    />
+        <result property="age"    column="age"    />
+        <result property="phoneNumber"    column="phone_number"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectPatientsVo">
+        select patient_id, user_name, gender, age, phone_number, created_time, updated_time from tb_patients
+    </sql>
+
+    <select id="selectPatientsList" parameterType="com.ruoyi.dental.domain.Patients" resultMap="PatientsResult">
+        <include refid="selectPatientsVo"/>
+        <where>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="gender != null  and gender != ''"> and gender = #{gender}</if>
+            <if test="age != null "> and age = #{age}</if>
+            <if test="phoneNumber != null  and phoneNumber != ''"> and phone_number = #{phoneNumber}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+        </where>
+
+    </select>
+
+    <select id="selectPatientsByPatientId" parameterType="Long" resultMap="PatientsResult">
+        <include refid="selectPatientsVo"/>
+        where patient_id = #{patientId}
+    </select>
+
+    <insert id="insertPatients" parameterType="com.ruoyi.dental.domain.Patients" useGeneratedKeys="true" keyProperty="patientId">
+        insert into tb_patients
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userName != null and userName != ''">user_name,</if>
+            <if test="gender != null and gender != ''">gender,</if>
+            <if test="age != null">age,</if>
+            <if test="phoneNumber != null and phoneNumber != ''">phone_number,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedTime != null">updated_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="gender != null and gender != ''">#{gender},</if>
+            <if test="age != null">#{age},</if>
+            <if test="phoneNumber != null and phoneNumber != ''">#{phoneNumber},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePatients" parameterType="com.ruoyi.dental.domain.Patients">
+        update tb_patients
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="gender != null and gender != ''">gender = #{gender},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="phoneNumber != null and phoneNumber != ''">phone_number = #{phoneNumber},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where patient_id = #{patientId}
+    </update>
+
+    <delete id="deletePatientsByPatientId" parameterType="Long">
+        delete from tb_patients where patient_id = #{patientId}
+    </delete>
+
+    <delete id="deletePatientsByPatientIds" parameterType="String">
+        delete from tb_patients where patient_id in
+        <foreach item="patientId" collection="array" open="(" separator="," close=")">
+            #{patientId}
+        </foreach>
+    </delete>
+</mapper>
