@@ -34,7 +34,6 @@ public class AddressController {
     @PostMapping("")
     @Operation(summary = "添加收货地址")
     public R addAddress(@RequestBody Address AddressParams) {
-        log.info("添加收货地址:{}",AddressParams);
         AddressParams.setCreateTime(new Date());
         AddressParams.setUpdateTime(new Date());
         Long userId = SecurityUtils.getUserId();
@@ -62,7 +61,6 @@ public class AddressController {
     @Operation(summary = "获取收货地址列表")
     public R<List<Address>> getAddressList() {
         //根据用户iD获取地址列表
-        log.info("获取收货地址列表");
 
         Long userId = SecurityUtils.getUserId();
         LambdaQueryWrapper<Address> query = new LambdaQueryWrapper<Address>();
@@ -76,7 +74,6 @@ public class AddressController {
     @Operation(summary = "获取收货地址详情")
     public R<Address> getAddressById(@PathVariable("id") Integer id) {
         Address address = addressService.getById(id);
-        log.info("获取收货地址详情:{}",id);
 
         if (address == null) {
             return R.fail("未找到该地址");
@@ -88,7 +85,6 @@ public class AddressController {
     @PutMapping("/{id}")
     @Operation(summary = "修改收货地址")
     public R updateAddress(@PathVariable("id") Integer id, @RequestBody Address address) {
-        log.info("修改收货地址:{}",address);
         address.setId(id);
         address.setUpdateTime(new Date());
         Long userId = SecurityUtils.getUserId();
@@ -111,7 +107,6 @@ public class AddressController {
     @DeleteMapping("/{id}")
     @Operation(summary = "删除收货地址")
     public R deleteAddress(@PathVariable("id") Integer id) {
-        log.info("删除收货地址");
         boolean success = addressService.removeById(id);
         return R.ok(success ? "删除成功" : "删除失败");
     }
