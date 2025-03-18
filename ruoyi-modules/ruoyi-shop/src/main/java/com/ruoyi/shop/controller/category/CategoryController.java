@@ -1,6 +1,7 @@
 package com.ruoyi.shop.controller.category;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.shop.domain.category.Category;
 import com.ruoyi.shop.service.category.CategoryService;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/category/")
+@RequestMapping(value = "/category")
 @Tag(name = "显示分类")
 public class CategoryController {
     @Autowired
@@ -24,6 +25,16 @@ public class CategoryController {
         List<Category> category = categoryService.list();
         return R.ok( category);
     }
+
+    @Operation(summary = "分类列表")
+    @GetMapping("/top")
+    public R getCategoryTop(){
+            LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
+            wrapper.select(Category::getCategoryId, Category::getCategoryName, Category::getCategoryIcon);
+            List<Category> list = categoryService.list(wrapper);
+            return R.ok(list);
+    }
+
 
     @Operation(summary = "增加分类")
     @PostMapping(value = "/addCategory")

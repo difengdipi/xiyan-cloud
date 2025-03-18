@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 @RestController
-@RequestMapping(value = "/banner/")
+@RequestMapping(value = "/home/banner/")
 @Tag(name = "显示banner")
 public class BannerController {
     @Autowired

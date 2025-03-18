@@ -24,7 +24,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/hot/")
+@RequestMapping(value = "/home/hot/")
 @Tag(name = "显示热门推荐")
 @Slf4j
 public class HotController {
