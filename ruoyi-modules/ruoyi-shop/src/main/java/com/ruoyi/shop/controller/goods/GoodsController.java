@@ -1,29 +1,27 @@
 package com.ruoyi.shop.controller.goods;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.bean.BeanUtils;
-import com.ruoyi.shop.domain.goods.Goods;
-import com.ruoyi.shop.domain.goods.GoodsBrand;
-import com.ruoyi.shop.domain.goods.GoodsParticulars;
-import com.ruoyi.shop.domain.goods.GoodsParticularsVo;
-import com.ruoyi.shop.service.goods.GoodsBrandService;
-import com.ruoyi.shop.service.goods.GoodsParticularsService;
-import com.ruoyi.shop.service.goods.GoodsService;
+import com.ruoyi.shop.controller.address.AddressController;
+import com.ruoyi.shop.domain.goods.*;
+import com.ruoyi.shop.mapper.goods.GoodsSkusMapper;
+import com.ruoyi.shop.mapper.goods.GoodsSpecMapper;
+import com.ruoyi.shop.mapper.goods.GoodsValueMapper;
+import com.ruoyi.shop.service.goods.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/goods/")
+@RequestMapping(value = "/goods")
 @Tag(name = "显示商品")
 public class GoodsController {
     @Autowired
@@ -99,22 +97,76 @@ public class GoodsController {
         Goods goods = goodsService.getById(goodsId);
         return R.ok( goods);
     }
+    @Autowired
+    private GoodsSkusMapper goodsSkusMapper;
+    @Autowired
+    private GoodsSpecMapper goodsSpecMapper;
+    @Autowired
+    private AddressController addressController;;
+    @Autowired
+    private GoodsDetailsService goodsDetailsService;
 
+    @Autowired
+    private GoodsPropertyService goodsPropertiesService;
+    @Autowired
+    private GoodsValueMapper goodsValueMapper;
     @Operation(summary = "按照商品详情编号联表查询数据")
-    @GetMapping(value = "/getGoodsById")
-    public R getGoodsByIds(@RequestParam("goodsId") Integer goodsId) {
+    @GetMapping(value = "")
+    public R getGoodsByIds(@RequestParam("id") Integer id) {
         List<GoodsParticularsVo> goodsParticularsVoList = new ArrayList<>();
-        GoodsParticulars goodsParticulars = goodsParticularsService.getById(goodsId);
-        Goods goods = goodsService.getById(goodsId);
-        GoodsBrand goodsBrand = goodsBrandService.getById(goodsParticulars.getBrandId());
+        GoodsParticulars goodsParticulars = goodsParticularsService.getById(id);
+        Goods goods = goodsService.getById(id);
+
+        GoodsBrand brand = goodsBrandService.getOne(new LambdaQueryWrapper<GoodsBrand>().eq(GoodsBrand::getBrandId, goodsParticulars.getBrandId()));
         GoodsParticularsVo goodsParticularsVo = new GoodsParticularsVo();
         BeanUtils.copyProperties(goodsParticularsVo, goodsParticulars);
-        goodsParticularsVo.setGoodsId(goods.getGoodsId());
-        goodsParticularsVo.setGoodsName(goods.getGoodsName());
-        goodsParticularsVo.setGoodsDesc(goods.getGoodsDesc());
-        goodsParticularsVo.setGoodsPrice(goods.getGoodsPrice());
-        goodsParticularsVo.setGoodsBrand(goodsBrand);
+        List<GoodsSkus> goodsSkuses = goodsSkusMapper
+                .selectList(new LambdaQueryWrapper<GoodsSkus>()
+                        .eq(GoodsSkus::getSkuId, goodsParticulars.getSkusId()
+                        ));
+
+        GoodsSpec goodsSpecs = goodsSpecMapper.selectById(goodsParticulars.getSpecId());
+
+        List<String> valueIdList = Arrays.stream(goodsSpecs.getSpecValues().split(",")).collect(Collectors.toList());
+
+        List<GoodsValue> goodsValues = goodsValueMapper.selectList(new LambdaQueryWrapper<GoodsValue>().in(GoodsValue::getValueId, valueIdList));
+
+        List<GoodsSpecVo> goodsSpecsVo = new ArrayList<>();
+        GoodsSpecVo build = GoodsSpecVo.builder()
+                .goodsValue(goodsValues)
+                .specId(goodsSpecs.getSpecId())
+                .specName(goodsSpecs.getSpecName())
+                .build();
+        goodsSpecsVo.add(build);
+
+        GoodsDetails details = goodsDetailsService.getById(goodsParticulars.getDetailsId());
+        Set<String> PropertyIdList = Arrays.stream(details.getDetailsProperty().split(",")).collect(Collectors.toSet());
+        LambdaQueryWrapper<GoodsProperty> eq = new LambdaQueryWrapper<GoodsProperty>().in(GoodsProperty::getPropertyId,
+                PropertyIdList);
+
+        List<GoodsProperty> list = goodsPropertiesService.list(eq);
+
+        GoodsDetailsVo goodsDetailsVo = GoodsDetailsVo.builder()
+                .detailsId(details.getDetailsId())
+                .detailsPictures(Arrays.stream(details.getDetailsPictures().split(",")).collect(Collectors.toList()))
+                .goodsProperty(list).build();
+
+        List<String> mainPic = Arrays.stream(goodsParticulars.getMainPictures().split(",")).collect(Collectors.toList());
+        //还需要goods_sku_spec
+         goodsParticularsVo =  GoodsParticularsVo.builder()
+                 .id(goods.getGoodsId())
+                .goodsName(goods.getGoodsName())
+                .goodsDesc(goods.getGoodsDesc())
+                .goodsPrice(goods.getGoodsPrice())
+                .goodsDetails(goodsDetailsVo)
+                .mainPictures(mainPic)
+                .goodsBrand(brand)
+                .goodsSkus(goodsSkuses)
+                .goodsSpec(goodsSpecsVo)
+                .addressList(addressController.getAddressList().getData())
+                .build();
         goodsParticularsVoList.add(goodsParticularsVo);
+
         return R.ok(goodsParticularsVoList);
     }
 

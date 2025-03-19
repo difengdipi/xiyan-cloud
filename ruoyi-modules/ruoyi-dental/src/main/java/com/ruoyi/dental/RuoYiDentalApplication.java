@@ -2,6 +2,7 @@ package com.ruoyi.dental;
 
 import com.ruoyi.common.security.annotation.EnableCustomConfig;
 import com.ruoyi.common.security.annotation.EnableRyFeignClients;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableCustomConfig
 @EnableRyFeignClients
 @SpringBootApplication
+@MapperScan("com.ruoyi.dental.mapper")
 public class RuoYiDentalApplication
 {
     public static void main(String[] args)

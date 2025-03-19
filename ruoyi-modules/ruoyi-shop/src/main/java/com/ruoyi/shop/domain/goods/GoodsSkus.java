@@ -14,6 +14,7 @@ public class GoodsSkus {
     private Integer skuId;
     private Integer skuInventory;
     private Double skuOldPrice;
+    private String skuPicture;
     private String skuPrice;
     private Integer skuCode;
     private String skuSpecsId;

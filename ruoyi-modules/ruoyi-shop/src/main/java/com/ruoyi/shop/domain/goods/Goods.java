@@ -21,6 +21,7 @@ public class Goods implements Serializable {
 
     @TableField("category_id")
     private Long categoryId;
+
     private String goodsName;
     private String goodsDesc;
     private Double goodsPrice;

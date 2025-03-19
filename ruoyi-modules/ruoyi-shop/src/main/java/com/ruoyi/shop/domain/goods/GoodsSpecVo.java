@@ -1,10 +1,17 @@
 package com.ruoyi.shop.domain.goods;
 
-import lombok.Data;
+import lombok.*;
+
+import java.util.List;
 
 @Data
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class GoodsSpecVo {
     private Integer specId;
     private String specName;
-    private GoodsValue goodsValue;
+    private List<GoodsValue> goodsValue;
 }

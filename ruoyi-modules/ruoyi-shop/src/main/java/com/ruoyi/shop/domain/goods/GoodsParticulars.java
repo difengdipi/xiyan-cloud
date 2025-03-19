@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +21,9 @@ public class GoodsParticulars {
     private Integer salesCount;
     private Double collectCount;
     private String mainVideos;
-    private List< String > mainPictures;
+
+
+    private String mainPictures;
     private Integer categoryId;
     private Integer detailsId;
     private Integer specId;

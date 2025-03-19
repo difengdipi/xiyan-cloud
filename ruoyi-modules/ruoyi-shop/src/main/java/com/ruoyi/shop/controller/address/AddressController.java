@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,8 +33,6 @@ public class AddressController {
     @PostMapping("")
     @Operation(summary = "添加收货地址")
     public R addAddress(@RequestBody Address AddressParams) {
-        AddressParams.setCreateTime(new Date());
-        AddressParams.setUpdateTime(new Date());
         Long userId = SecurityUtils.getUserId();
         if(userId == null){
             return R.fail("账户未登录");
@@ -61,7 +58,6 @@ public class AddressController {
     @Operation(summary = "获取收货地址列表")
     public R<List<Address>> getAddressList() {
         //根据用户iD获取地址列表
-
         Long userId = SecurityUtils.getUserId();
         LambdaQueryWrapper<Address> query = new LambdaQueryWrapper<Address>();
         query.eq(Address::getUserId, userId).orderByDesc(Address::getUpdateTime);
@@ -86,7 +82,6 @@ public class AddressController {
     @Operation(summary = "修改收货地址")
     public R updateAddress(@PathVariable("id") Integer id, @RequestBody Address address) {
         address.setId(id);
-        address.setUpdateTime(new Date());
         Long userId = SecurityUtils.getUserId();
         if(address.getIsDefault() == 1){
             //添加地址后只能有一个是默认地址，需将之前的默认地址取消
