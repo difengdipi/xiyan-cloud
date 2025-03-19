@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.dental.mapper.AppointmentsMapper">
 
-    <resultMap type="Appointments" id="AppointmentsResult">
+    <resultMap type="com.ruoyi.dental.domain.Appointments" id="AppointmentsResult">
         <result property="appointmentId"    column="appointment_id"    />
         <result property="patientId"    column="patient_id"    />
         <result property="doctorId"    column="doctor_Id"    />
@@ -19,7 +19,7 @@
         select appointment_id, patient_id, doctor_Id, appointment_date, notes, chief_complaint, created_at, updated_at from tb_appointments
     </sql>
 
-    <select id="selectAppointmentsList" parameterType="Appointments" resultMap="AppointmentsResult">
+    <select id="selectAppointmentsList" parameterType="com.ruoyi.dental.domain.Appointments" resultMap="AppointmentsResult">
         <include refid="selectAppointmentsVo"/>
         <where>
             <if test="patientId != null "> and patient_id = #{patientId}</if>
@@ -36,7 +36,7 @@
         where appointment_id = #{appointmentId}
     </select>
 
-    <insert id="insertAppointments" parameterType="Appointments" useGeneratedKeys="true" keyProperty="appointmentId">
+    <insert id="insertAppointments" parameterType="com.ruoyi.dental.domain.Appointments" useGeneratedKeys="true" keyProperty="appointmentId">
         insert into tb_appointments
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="patientId != null">patient_id,</if>
@@ -58,7 +58,7 @@
         </trim>
     </insert>
 
-    <update id="updateAppointments" parameterType="Appointments">
+    <update id="updateAppointments" parameterType="com.ruoyi.dental.domain.Appointments">
         update tb_appointments
         <trim prefix="SET" suffixOverrides=",">
             <if test="patientId != null">patient_id = #{patientId},</if>

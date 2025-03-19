@@ -1,8 +1,10 @@
 package com.ruoyi.dental.domain;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.ruoyi.common.core.annotation.Excel;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+
+import java.util.Date;
 
 /**
  * 医生信息对象 tb_doctors
@@ -12,46 +14,28 @@ import lombok.Data;
  */
 @Data
 @TableName("tb_doctors")
-public class Doctors   {
-    private static final long serialVersionUID = 1L;
+public class Doctors {
 
-    /**
-     * 主键ID
-     */
+    @Id // 标识主键
     private Long id;
 
-    /**
-     * 关联的用户id
-     */
     private Long userId;
 
-    /**
-     * 医生姓名
-     */
-    @Excel(name = "医生姓名")
     private String name;
 
-    /**
-     * 职称
-     */
-    @Excel(name = "职称")
+    private Integer status; // 注意这里用Integer而不是int，允许存储null值
+
+    private String avatar;
+
     private String title;
 
-    /**
-     * 所属医院
-     */
-    @Excel(name = "所属医院")
     private String hospital;
 
-    /**
-     * 专业特长
-     */
-    @Excel(name = "专业特长")
     private String specialty;
 
-    /**
-     * 详细介绍
-     */
-    @Excel(name = "详细介绍")
     private String detail;
+
+    private Date createTime;
+
+    private Date updateTime;
 }

@@ -95,4 +95,6 @@ public class AppointmentsController extends BaseController
     {
         return toAjax(appointmentsService.deleteAppointmentsByAppointmentIds(appointmentIds));
     }
+
+
 }

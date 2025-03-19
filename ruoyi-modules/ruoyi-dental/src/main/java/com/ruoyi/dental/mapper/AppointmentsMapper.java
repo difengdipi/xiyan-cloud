@@ -2,6 +2,7 @@ package com.ruoyi.dental.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.dental.domain.Appointments;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * @author zh
  * @date 2025-03-15
  */
+@Mapper
 public interface AppointmentsMapper  extends BaseMapper<Appointments>
 {
     /**

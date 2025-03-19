@@ -14,6 +14,7 @@ import com.ruoyi.dental.service.IDoctorsService;
 import com.ruoyi.system.api.domain.SysUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/doctors")
 @Tag(name = "医生信息")
+@Slf4j
 public class DoctorsController extends BaseController
 {
     @Autowired
@@ -114,5 +116,21 @@ public class DoctorsController extends BaseController
     @InnerAuth
     public R insertBySysUser(@RequestBody SysUser sysUser){
         return doctorsService.insertBySysUser(sysUser);
+    }
+
+    @Operation(summary = "获取今日在线医生")
+    @GetMapping("/infos")
+    public R getDockersInfo(){
+        List<Doctors> list = doctorsService.list();
+        log.info("获取今日在线医生:{}",list);
+        return  R.ok(list);
+    }
+
+    @Operation(summary = "根据医生id获取医生信息")
+    @GetMapping("/infos/byId/{id}")
+    public R getDockerInfo(@PathVariable("id") Long id){
+        Doctors doctors = doctorsService.getById(id);
+        log.info("根据医生id获取医生信息:{}",doctors);
+        return  R.ok(doctors);
     }
 }

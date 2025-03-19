@@ -16,10 +16,10 @@ import java.util.Date;
  * @author zh
  * @date 2025-03-15
  */
-@TableName("tb_Patients")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@TableName("tb_Patients")
 public class Patients
 {
     private static final long serialVersionUID = 1L;

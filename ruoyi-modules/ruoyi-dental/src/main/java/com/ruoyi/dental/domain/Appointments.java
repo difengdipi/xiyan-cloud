@@ -1,5 +1,6 @@
 package com.ruoyi.dental.domain;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.annotation.Excel;
 import com.ruoyi.common.core.web.domain.BaseEntity;
@@ -14,6 +15,7 @@ import java.util.Date;
  * @author zh
  * @date 2025-03-15
  */
+@TableName("tb_appointments")
 public class Appointments extends BaseEntity
 {
     private static final long serialVersionUID = 1L;

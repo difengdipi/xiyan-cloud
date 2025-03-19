@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.dental.mapper.FollowUpTasksMapper">
 
-    <resultMap type="FollowUpTasks" id="FollowUpTasksResult">
+    <resultMap type="com.ruoyi.dental.domain.FollowUpTasks" id="FollowUpTasksResult">
         <result property="taskId"    column="task_id"    />
         <result property="patientId"    column="patient_id"    />
         <result property="description"    column="description"    />
@@ -18,7 +18,7 @@
         select task_id, patient_id, description, due_date, status, created_at, updated_at from tb_follow_up_tasks
     </sql>
 
-    <select id="selectFollowUpTasksList" parameterType="FollowUpTasks" resultMap="FollowUpTasksResult">
+    <select id="selectFollowUpTasksList" parameterType="com.ruoyi.dental.domain.FollowUpTasks" resultMap="FollowUpTasksResult">
         <include refid="selectFollowUpTasksVo"/>
         <where>
             <if test="patientId != null "> and patient_id = #{patientId}</if>
@@ -33,7 +33,7 @@
         where task_id = #{taskId}
     </select>
 
-    <insert id="insertFollowUpTasks" parameterType="FollowUpTasks" useGeneratedKeys="true" keyProperty="taskId">
+    <insert id="insertFollowUpTasks" parameterType="com.ruoyi.dental.domain.FollowUpTasks" useGeneratedKeys="true" keyProperty="taskId">
         insert into tb_follow_up_tasks
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="patientId != null">patient_id,</if>
@@ -53,7 +53,7 @@
         </trim>
     </insert>
 
-    <update id="updateFollowUpTasks" parameterType="FollowUpTasks">
+    <update id="updateFollowUpTasks" parameterType="com.ruoyi.dental.domain.FollowUpTasks">
         update tb_follow_up_tasks
         <trim prefix="SET" suffixOverrides=",">
             <if test="patientId != null">patient_id = #{patientId},</if>

@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.dental.mapper.DoctorsMapper">
 
-    <resultMap type="Doctors" id="DoctorsResult">
+    <resultMap type="com.ruoyi.dental.domain.Doctors" id="DoctorsResult">
         <result property="id"    column="id"    />
         <result property="userId"    column="user_id"    />
         <result property="name"    column="name"    />
@@ -18,7 +18,7 @@
         select id, user_id, name, title, hospital, specialty, detail from tb_doctors
     </sql>
 
-    <select id="selectDoctorsList" parameterType="Doctors" resultMap="DoctorsResult">
+    <select id="selectDoctorsList" parameterType="com.ruoyi.dental.domain.Doctors" resultMap="DoctorsResult">
         <include refid="selectDoctorsVo"/>
         <where>
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
@@ -32,7 +32,7 @@
         where id = #{id}
     </select>
 
-    <insert id="insertDoctors" parameterType="Doctors" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDoctors" parameterType="com.ruoyi.dental.domain.Doctors" useGeneratedKeys="true" keyProperty="id">
         insert into tb_doctors
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="userId != null and userId != ''">user_id,</if>
@@ -52,7 +52,7 @@
         </trim>
     </insert>
 
-    <update id="updateDoctors" parameterType="Doctors">
+    <update id="updateDoctors" parameterType="com.ruoyi.dental.domain.Doctors">
         update tb_doctors
         <trim prefix="SET" suffixOverrides=",">
             <if test="userId != null and userId != ''">user_id = #{userId},</if>
