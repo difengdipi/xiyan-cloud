@@ -1,5 +1,6 @@
 package com.ruoyi.dental.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.web.controller.BaseController;
@@ -10,7 +11,9 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.InnerAuth;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.dental.domain.Doctors;
+import com.ruoyi.dental.domain.doctorSchedules;
 import com.ruoyi.dental.service.IDoctorsService;
+import com.ruoyi.dental.service.IdoctorSchedules;
 import com.ruoyi.system.api.domain.SysUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -130,7 +134,18 @@ public class DoctorsController extends BaseController
     @GetMapping("/infos/byId/{id}")
     public R getDockerInfo(@PathVariable("id") Long id){
         Doctors doctors = doctorsService.getById(id);
-        log.info("根据医生id获取医生信息:{}",doctors);
         return  R.ok(doctors);
+    }
+    @Autowired
+    IdoctorSchedules doctorSchedulesService;
+    @Operation(summary = "根据医生id获取医生未来两周的时间安排表")
+    @GetMapping("/AppointSchedule/{id}")
+    public R getAppointmentSchedule(@PathVariable("id")Long id)
+    {
+        List<doctorSchedules> list = doctorSchedulesService.list(
+                new LambdaQueryWrapper<doctorSchedules>().eq(doctorSchedules::getDoctorId,id)
+                        .gt(doctorSchedules::getDate,new Date())
+        );
+        return R.ok(list);
     }
 }

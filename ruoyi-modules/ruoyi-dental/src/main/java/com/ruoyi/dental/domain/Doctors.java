@@ -32,6 +32,8 @@ public class Doctors {
     private String hospital;
 
     private String specialty;
+    //总预约数
+    private String appNum;
 
     private String detail;
 
