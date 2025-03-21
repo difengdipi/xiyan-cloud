@@ -2,6 +2,7 @@ package com.ruoyi.dental.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.security.Util.DentalUtils;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.service.IUserAppInfoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,8 +47,11 @@ public class UserAppInfoController {
     @Operation(summary= "添加用户病例预约信息")
     @PutMapping("/add")
     public R addAppUserInfo(@RequestBody UserAppInfo appUserInfo){
+        Long userid = DentalUtils.getUserId();
+        appUserInfo.setUserId(userid);
         log.info("添加用户病例预约信息:{}",appUserInfo);
-        return R.ok(userAppInfoService.save(appUserInfo)? "添加成功" : "添加失败");
+        userAppInfoService.save(appUserInfo);
+        return R.ok(appUserInfo.getId());
     }
 
     @Operation(summary = "更新用户病例预约信息")

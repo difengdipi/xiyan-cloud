@@ -6,6 +6,7 @@ import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.SecurityConstants;
 import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.context.SecurityContextHolder;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.enums.UserStatus;
 import com.ruoyi.common.core.exception.ServiceException;
@@ -167,6 +168,14 @@ public class SysLoginService
      * @return
      */
     public LoginUserVO wxMinLogin(UserLoginDTO dto) {
+//        LoginUser build = LoginUser.builder()
+//                .token(token)
+//                .userid(sysUser.getUserId())
+//                .loginTime(System.currentTimeMillis())
+//                .ipaddr(IpUtils.getIpAddr())
+//                .build();
+
+        SecurityContextHolder.set(SecurityConstants.LOGIN_USER, null);
         return null;
     }
 
@@ -210,12 +219,18 @@ public class SysLoginService
                     if(sysUser.getAvatar() == null){
                         sysUser.setAvatar("https://typo-img.oss-cn-chengdu.aliyuncs.com/img-localhost/202503141042425.jpg");
                     }
-
                     loginUserVO.setUserName(sysUser.getUserName());
                     loginUserVO.setNickName(sysUser.getNickName());
                     loginUserVO.setPhonenumber(sysUser.getPhonenumber());
                     String token = (String) tokenService.createAppToekn(sysUser).get("access_token");
-                    System.out.println(token);
+                    LoginUser build = LoginUser.builder()
+                            .token(token)
+                            .userid(sysUser.getUserId())
+                            .loginTime(System.currentTimeMillis())
+                            .ipaddr(IpUtils.getIpAddr())
+                            .build();
+
+                    SecurityContextHolder.set(SecurityConstants.LOGIN_USER, build);
                     loginUserVO.setToken(token);
                 }
             }
@@ -238,6 +253,14 @@ public class SysLoginService
             loginUserVO.setPhonenumber(sysUser.getPhonenumber());
             String token = (String) tokenService.createToken(login).get("access_token");
             loginUserVO.setToken(token);
+            LoginUser build = LoginUser.builder()
+                    .token(token)
+                    .userid(sysUser.getUserId())
+                    .loginTime(System.currentTimeMillis())
+                    .ipaddr(IpUtils.getIpAddr())
+                    .build();
+
+            SecurityContextHolder.set(SecurityConstants.LOGIN_USER, build);
         }else{
             //提示用户需要注册
             throw new ServiceException("用户不存在");

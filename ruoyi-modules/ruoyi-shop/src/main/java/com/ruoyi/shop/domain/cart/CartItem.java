@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor // Generates a constructor with no parameters
 @AllArgsConstructor // Generates a constructor with all parameters
 @Builder // Builder pattern for creating instances of this class
-@TableName("sys")
+@TableName("sys_cart_item")
 public class CartItem {
 
     @Id // Specifies the primary key of the entity

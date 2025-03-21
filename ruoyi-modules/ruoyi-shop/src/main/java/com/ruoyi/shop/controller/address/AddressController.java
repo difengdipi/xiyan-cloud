@@ -1,8 +1,9 @@
 package com.ruoyi.shop.controller.address;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.security.utils.SecurityUtils;
+import com.ruoyi.common.security.Util.DentalUtils;
 import com.ruoyi.shop.domain.address.Address;
 import com.ruoyi.shop.service.address.IAddressService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +34,7 @@ public class AddressController {
     @PostMapping("")
     @Operation(summary = "添加收货地址")
     public R addAddress(@RequestBody Address AddressParams) {
-        Long userId = SecurityUtils.getUserId();
+        Long userId = DentalUtils.getUserId();
         if(userId == null){
             return R.fail("账户未登录");
         }
@@ -58,7 +59,7 @@ public class AddressController {
     @Operation(summary = "获取收货地址列表")
     public R<List<Address>> getAddressList() {
         //根据用户iD获取地址列表
-        Long userId = SecurityUtils.getUserId();
+        Long userId = DentalUtils.getUserId();
         LambdaQueryWrapper<Address> query = new LambdaQueryWrapper<Address>();
         query.eq(Address::getUserId, userId).orderByDesc(Address::getUpdateTime);
         List<Address> list = addressService.list(query);
@@ -81,18 +82,16 @@ public class AddressController {
     @PutMapping("/{id}")
     @Operation(summary = "修改收货地址")
     public R updateAddress(@PathVariable("id") Integer id, @RequestBody Address address) {
+        //TODO:设置默认收货地址
         address.setId(id);
-        Long userId = SecurityUtils.getUserId();
+        Long userId = DentalUtils.getUserId();
         if(address.getIsDefault() == 1){
             //添加地址后只能有一个是默认地址，需将之前的默认地址取消
-            LambdaQueryWrapper<Address> queryWrapper =  new LambdaQueryWrapper<>();
-            LambdaQueryWrapper<Address> eq = queryWrapper.eq(Address::getUserId, userId).eq(Address::getIsDefault, 1);
-            boolean exists = addressService.exists(eq);
-            if(exists){
-                Address dto = addressService.getOne(eq);
-                dto.setIsDefault(0);
-                addressService.updateById(dto);
-            }
+            //取消之前的收货地址
+            LambdaUpdateWrapper<Address> eq = new LambdaUpdateWrapper<Address>().set(Address::getIsDefault, 0).eq(Address::getUserId, userId)
+                    .eq(Address::getIsDefault, 1);
+            addressService.update(eq);
+            //将现在的设为收货地址
         }
         boolean success = addressService.updateById(address);
         return R.ok(success ? "修改成功" : "修改失败");

@@ -29,7 +29,7 @@ public class Address {
     private String cityCode; // 城市编码
 
     private String countyCode; // 区/县编码
-
+    private String fullLocation; // 省市区
     private String address; // 详细地址
 
     private Integer isDefault; // 是否默认地址, 1为是，0为否
