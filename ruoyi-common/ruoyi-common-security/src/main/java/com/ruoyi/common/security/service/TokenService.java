@@ -13,6 +13,7 @@ import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.api.model.LoginUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -78,12 +79,28 @@ public class TokenService
         claimsMap.put(SecurityConstants.USER_KEY, token);
         claimsMap.put(SecurityConstants.DETAILS_USER_ID, sysUser.getUserId());
         claimsMap.put(SecurityConstants.DETAILS_USERNAME, sysUser.getPhonenumber());
+        LoginUser loginUser = new LoginUser();
+        loginUser.setToken(token);
+        BeanUtils.copyProperties(sysUser,loginUser);
+        refreshAppToken(loginUser);
 
         // 接口返回信息
         Map<String, Object> rspMap = new HashMap<String, Object>();
         rspMap.put("access_token", JwtUtils.createToken(claimsMap));
         rspMap.put("expires_in", TOKEN_EXPIRE_TIME);
         return rspMap;
+    }
+
+    /**
+     * 小程序端刷新toekn
+     * @param loginUser
+     */
+    private void refreshAppToken(LoginUser loginUser){
+        loginUser.setLoginTime(System.currentTimeMillis());
+        loginUser.setExpireTime(loginUser.getLoginTime() + TOKEN_EXPIRE_TIME * MILLIS_MINUTE);
+        // 根据uuid将loginUser缓存
+        String userKey = getTokenKey(loginUser.getToken());
+        redisService.setCacheObject(userKey, loginUser, TOKEN_EXPIRE_TIME, TimeUnit.MINUTES);
     }
 
     /**
@@ -171,7 +188,7 @@ public class TokenService
     }
 
     /**
-     * 刷新令牌有效期
+     * 刷新令牌有效期  TODO：这里存储的方式与之前的模块定义的不一致，需要修改
      *
      * @param loginUser 登录信息
      */

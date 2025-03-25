@@ -87,7 +87,6 @@ public class SysLoginService
         {
             throw new ServiceException(userResult.getMsg());
         }
-
         LoginUser userInfo = userResult.getData();
         SysUser user = userResult.getData().getSysUser();
         if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
@@ -187,6 +186,7 @@ public class SysLoginService
     public LoginUserVO wxMinSimpleLogin(String phoneNumber) {
         LoginUserVO loginUserVO = new LoginUserVO();
         SysUser sysUser ;
+        LoginUser build = null;
         if (StringUtils.isNotBlank(phoneNumber)) {
             R<LoginUser> userResult = remoteUserService.getinfoByphone(phoneNumber, SecurityConstants.INNER);
             if (R.SUCCESS == userResult.getCode()) {
@@ -201,6 +201,12 @@ public class SysLoginService
                     loginUserVO.setNickName(sysUser.getNickName());
                     loginUserVO.setPhonenumber(sysUser.getPhonenumber());
                     String token = (String) tokenService.createAppToekn(sysUser).get("access_token");
+                    build = LoginUser.builder()
+                            .token(token)
+                            .userid(sysUser.getUserId())
+                            .loginTime(System.currentTimeMillis())
+                            .ipaddr(IpUtils.getIpAddr())
+                            .build();
                     loginUserVO.setToken(token);
                 }else{
                     //注册该用户
@@ -223,15 +229,15 @@ public class SysLoginService
                     loginUserVO.setNickName(sysUser.getNickName());
                     loginUserVO.setPhonenumber(sysUser.getPhonenumber());
                     String token = (String) tokenService.createAppToekn(sysUser).get("access_token");
-                    LoginUser build = LoginUser.builder()
+                    build = LoginUser.builder()
                             .token(token)
                             .userid(sysUser.getUserId())
                             .loginTime(System.currentTimeMillis())
                             .ipaddr(IpUtils.getIpAddr())
                             .build();
-
                     SecurityContextHolder.set(SecurityConstants.LOGIN_USER, build);
                     loginUserVO.setToken(token);
+                    tokenService.setLoginUser(build);
                 }
             }
         }
@@ -259,7 +265,7 @@ public class SysLoginService
                     .loginTime(System.currentTimeMillis())
                     .ipaddr(IpUtils.getIpAddr())
                     .build();
-
+            tokenService.refreshToken(build);
             SecurityContextHolder.set(SecurityConstants.LOGIN_USER, build);
         }else{
             //提示用户需要注册

@@ -9,4 +9,29 @@
         from tb_user_app_info
         where status = 2 group by docker_id
     </select>
+    <select id="AppDetailVolsit" resultType="com.ruoyi.dental.domain.vo.AppDetailVo">
+        SELECT
+            tb_user_app_info.id,
+            tb_d.avatar,
+            tb_user_app_info.NAME as 'name',
+            tb_d.NAME AS 'doctorName',
+            tb_d.hospital AS hospital,
+            tb_user_app_info.STATUS as `status`,
+            app_status AS appStatus,
+            tb_user_app_info.phone,
+            tb_user_app_info.idcard,
+            tb_user_app_info.cancel_reason AS cancelReason,
+            tb_ds.DATE AS DATE
+        FROM
+            tb_user_app_info
+            LEFT JOIN tb_doctors AS tb_d ON tb_user_app_info.doctor_id = tb_d.id
+            LEFT JOIN tb_doctor_schedules AS tb_ds ON tb_user_app_info.schedule_id = tb_ds.id
+         <where>
+             <if test="userId != null">
+                     AND tb_user_app_info.user_id = #{userId}
+             </if>
+         </where>
+        ORDER BY
+            tb_user_app_info.update_time DESC
+    </select>
 </mapper>

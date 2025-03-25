@@ -11,8 +11,10 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.InnerAuth;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.dental.domain.Doctors;
+import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.doctorSchedules;
 import com.ruoyi.dental.service.IDoctorsService;
+import com.ruoyi.dental.service.IUserAppInfoService;
 import com.ruoyi.dental.service.IdoctorSchedules;
 import com.ruoyi.system.api.domain.SysUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -126,7 +128,6 @@ public class DoctorsController extends BaseController
     @GetMapping("/infos")
     public R getDockersInfo(){
         List<Doctors> list = doctorsService.list();
-        log.info("获取今日在线医生:{}",list);
         return  R.ok(list);
     }
 
@@ -148,4 +149,15 @@ public class DoctorsController extends BaseController
         );
         return R.ok(list);
     }
+    @Autowired
+    IUserAppInfoService userAppInfoService;
+    @Operation(summary = "根据预约id获取医生信息")
+    @GetMapping("/infos/byAppId/{id}")
+    public R getDentalInfo(@PathVariable("id")Long id)
+    {
+        UserAppInfo byId = userAppInfoService.getById(id);
+        Doctors doctors = doctorsService.getById(byId.getDoctorId());
+        return R.ok(doctors);
+    }
+
 }

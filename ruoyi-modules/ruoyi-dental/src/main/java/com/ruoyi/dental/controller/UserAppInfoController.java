@@ -1,12 +1,18 @@
 package com.ruoyi.dental.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.security.Util.DentalUtils;
 import com.ruoyi.dental.domain.UserAppInfo;
+import com.ruoyi.dental.domain.doctorSchedules;
+import com.ruoyi.dental.domain.vo.AppDetailReasonDto;
+import com.ruoyi.dental.domain.vo.AppDetailVo;
 import com.ruoyi.dental.service.IUserAppInfoService;
+import com.ruoyi.dental.service.IdoctorSchedules;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,4 +72,38 @@ public class UserAppInfoController {
 
     }
 
+    @Operation(summary = "查询用户的全部预约")
+    @GetMapping("/list")
+    public R getAllAppUserInfo(){
+        Long userId = DentalUtils.getUserId();
+        //根据用户id查询全部的预约信息表
+        List<AppDetailVo> AppDetailVolsit = userAppInfoService.AllApplist(userId);
+        log.info("查询用户的全部预约:{}",AppDetailVolsit);
+        return R.ok(AppDetailVolsit);
+    }
+
+    @Autowired
+    IdoctorSchedules doctorSchedulesService;
+    @Operation(summary = "查询用户的预约详细信息")
+    @GetMapping("/byId/{id}")
+    public R geetUserByid(@PathVariable("id")Long id){
+        UserAppInfo byId = userAppInfoService.getById(id);
+        AppDetailVo appDetailVo = new AppDetailVo();
+        BeanUtils.copyProperties(byId,appDetailVo);
+        doctorSchedules one = doctorSchedulesService.getOne(new LambdaQueryWrapper<doctorSchedules>()
+                .eq(doctorSchedules::getId, byId.getScheduleId()));
+        appDetailVo.setDate(one.getDate());
+        return R.ok(appDetailVo);
+    }
+
+    @PutMapping("/cancel/{id}")
+    @Operation(summary = "取消预约")
+    public R cancelAppUserInfo(@PathVariable("id")Long id,@RequestBody AppDetailReasonDto dto){
+        boolean update = userAppInfoService.update(new LambdaUpdateWrapper<UserAppInfo>()
+                .eq(UserAppInfo::getId, id)
+                .set(UserAppInfo::getCancelReason, dto.getReason())
+                .set(UserAppInfo::getStatus, 2)
+        );
+        return update? R.ok("取消成功") : R.fail("取消失败");
+    }
 }
