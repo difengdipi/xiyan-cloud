@@ -22,4 +22,5 @@ public class UserAppInfo {
     private String cancelReason;// 取消原因
     private Date createTime; // 创建时间
     private Date updateTime; // 更新时间
+
 }

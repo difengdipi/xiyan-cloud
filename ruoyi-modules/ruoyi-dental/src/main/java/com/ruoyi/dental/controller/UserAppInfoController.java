@@ -16,7 +16,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:
@@ -32,6 +34,7 @@ import java.util.List;
 public class UserAppInfoController {
     @Autowired
     IUserAppInfoService userAppInfoService;
+
     /**
      *  根据用户id查询所创建的用户的病例
      * @param id
@@ -105,5 +108,27 @@ public class UserAppInfoController {
                 .set(UserAppInfo::getStatus, 2)
         );
         return update? R.ok("取消成功") : R.fail("取消失败");
+    }
+
+    @GetMapping("/list/ById")
+    @Operation(summary = "查询用户所创建的全部患者信息")
+    public  R getAppUserInfoByUserId( ){
+        Long userId = DentalUtils.getUserId();
+        List<UserAppInfo> list = userAppInfoService.list(new LambdaQueryWrapper<UserAppInfo>().eq(UserAppInfo::getUserId,userId));
+        Map<String,Integer> map = new HashMap<>();
+        for (int i = 0; i < list.size(); i++) {
+            if(map.isEmpty()){
+                map.put(list.get(i).getIdcard(),map.getOrDefault(list.get(i).getIdcard(),0));
+                continue;
+            }
+            if(map.containsKey(list.get(i).getIdcard())){
+                log.info("移除的信息：{}",list.get(i).getIdcard());
+                list.remove(i);
+            }else {
+                map.put(list.get(i).getIdcard(),1);
+            }
+        }
+        log.info("查询用户所创建的全部患者信息：{}",list);
+        return R.ok(list);
     }
 }
