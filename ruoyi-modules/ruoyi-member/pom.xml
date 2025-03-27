@@ -8,11 +8,12 @@
         <artifactId>ruoyi-modules</artifactId>
         <version>3.6.5</version>
     </parent>
-    <groupId>com.ruoyi</groupId>
 
-    <artifactId>ruoyi-Ai</artifactId>
+    <artifactId>ruoyi-member</artifactId>
+    <description>用于用户支付和存储用户支付记录</description>
 
     <dependencies>
+
         <!-- SpringCloud Alibaba Nacos -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -96,17 +97,6 @@
             <version>4.9</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <build>

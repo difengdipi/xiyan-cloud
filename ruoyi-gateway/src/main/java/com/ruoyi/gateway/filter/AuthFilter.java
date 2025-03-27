@@ -62,6 +62,7 @@ public class AuthFilter implements GlobalFilter, Ordered
             return unauthorizedResponse(exchange, "令牌已过期或验证不正确！");
         }
         String userkey = JwtUtils.getUserKey(claims);
+        //过不去网关的核心，redis中key设置的不一样
         boolean islogin = redisService.hasKey(getTokenKey(userkey));
         if (!islogin)
         {
