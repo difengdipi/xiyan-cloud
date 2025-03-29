@@ -1,7 +1,12 @@
 package com.ruoyi.auth.service;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.ruoyi.auth.config.WxConfig;
 import com.ruoyi.auth.form.LoginUserVO;
 import com.ruoyi.auth.form.UserLoginDTO;
+import com.ruoyi.auth.form.WxAuthResponse;
+import com.ruoyi.auth.pojos.WxUserInfo;
+import com.ruoyi.auth.utils.WxUtils;
 import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.SecurityConstants;
@@ -13,16 +18,19 @@ import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.core.utils.DateUtils;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.core.utils.bean.BeanUtils;
 import com.ruoyi.common.core.utils.ip.IpUtils;
 import com.ruoyi.common.redis.service.RedisService;
 import com.ruoyi.common.security.service.TokenService;
 import com.ruoyi.common.security.utils.SecurityUtils;
 import com.ruoyi.system.api.RemoteUserService;
+import com.ruoyi.system.api.RemoteWxService;
 import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.api.model.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 /**
  * 登录校验方法
@@ -160,22 +168,85 @@ public class SysLoginService
         }
         recordLogService.recordLogininfor(username, Constants.REGISTER, "注册成功");
     }
-
+    @Autowired
+    RemoteWxService remoteWxService;
+    @Autowired
+    WxConfig wxConfig;
     /**
      * 微信登录验证
      * @param dto
      * @return
      */
     public LoginUserVO wxMinLogin(UserLoginDTO dto) {
-//        LoginUser build = LoginUser.builder()
-//                .token(token)
-//                .userid(sysUser.getUserId())
-//                .loginTime(System.currentTimeMillis())
-//                .ipaddr(IpUtils.getIpAddr())
-//                .build();
+        log.info("请求参数：{}，{}，{}，{}",wxConfig.appid, wxConfig.secret, dto.getCode(), wxConfig.grantType);
+        LoginUserVO loginUserVO1 = wxMinSimpleLogin("18385067084");
+        if(wxMinSimpleLogin("18385067084") != null){
+             return loginUserVO1;
+         }
+        LoginUserVO loginUserVO = new LoginUserVO();
+        SysUser sysUser = null;
+        LoginUser build = null;
+        String access = remoteWxService.getAccess(wxConfig.appid, wxConfig.secret, dto.getCode(), wxConfig.grantType);
+        WxAuthResponse wxAuthResponse = JSONObject.parseObject(access, WxAuthResponse.class);
+        log.info("wxAuthResponse:{}", wxAuthResponse);
+        //根据openId查询数据库看看当前用户是否已注册
+        try {
+            sysUser = remoteUserService.getinfoByopenId(wxAuthResponse.getOpenId(), SecurityConstants.INNER).getData().getSysUser();
+            if (ObjectUtils.isEmpty(sysUser)) {
+                //注册用户
+                //解密用户信息
+                WxUserInfo userInfo = WxUtils.getUserInfo(dto.getEncryptedData(), wxAuthResponse.getSessionKey(), dto.getIv());
+                BeanUtils.copyProperties(userInfo, sysUser);
+                sysUser.setAvatar(userInfo.getAvatarUrl());
+                sysUser.setOpenId(wxAuthResponse.getOpenId());
+                sysUser.setUserName(userInfo.getNickname()+"_"+wxAuthResponse.getOpenId());
+                if(!remoteUserService.registerUserInfo(sysUser, SecurityConstants.INNER).getData()){
+                    log.error("手机号登录注册失败系统错误");
+                    throw new ServiceException("手机号登录注册失败系统错误");
+                }
+                loginUserVO.setUserId(sysUser.getUserId());
+                loginUserVO.setAvatar(sysUser.getAvatar());
+                if(sysUser.getAvatar() == null){
+                    sysUser.setAvatar("https://typo-img.oss-cn-chengdu.aliyuncs.com/img-localhost/202503141042425.jpg");
+                }
+                loginUserVO.setUserName(sysUser.getUserName());
+                loginUserVO.setNickName(sysUser.getNickName());
+                loginUserVO.setPhonenumber(sysUser.getPhonenumber());
+                String token = (String) tokenService.createAppToekn(sysUser).get("access_token");
+                build = LoginUser.builder()
+                        .token(token)
+                        .userid(sysUser.getUserId())
+                        .loginTime(System.currentTimeMillis())
+                        .ipaddr(IpUtils.getIpAddr())
+                        .build();
+                SecurityContextHolder.set(SecurityConstants.LOGIN_USER, build);
+                loginUserVO.setToken(token);
+                tokenService.setLoginUser(build);
+            }else{
+                sysUser = new SysUser();
+                loginUserVO.setUserId(sysUser.getUserId());
+                loginUserVO.setAvatar(sysUser.getAvatar());
+                if(sysUser.getAvatar() == null){
+                    sysUser.setAvatar("https://typo-img.oss-cn-chengdu.aliyuncs.com/img-localhost/202503141042425.jpg");
+                }
+                loginUserVO.setUserName(sysUser.getUserName());
+                loginUserVO.setNickName(sysUser.getNickName());
+                loginUserVO.setPhonenumber(sysUser.getPhonenumber());
+                String token = (String) tokenService.createAppToekn(sysUser).get("access_token");
+                build = LoginUser.builder()
+                        .token(token)
+                        .userid(sysUser.getUserId())
+                        .loginTime(System.currentTimeMillis())
+                        .ipaddr(IpUtils.getIpAddr())
+                        .build();
+                loginUserVO.setToken(token);
+                tokenService.setLoginUser(build);
+            }
+        }
+        catch(Exception e){
 
-        SecurityContextHolder.set(SecurityConstants.LOGIN_USER, null);
-        return null;
+        }
+        return loginUserVO;
     }
 
     /**

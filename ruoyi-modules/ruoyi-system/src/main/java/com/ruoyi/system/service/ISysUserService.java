@@ -42,7 +42,13 @@ public interface ISysUserService
      * @return 用户对象信息
      */
     public SysUser selectUserByUserName(String userName);
-
+    /**
+     * 通过opneid查询用户
+     *
+     * @param openid 用户名
+     * @return 用户对象信息
+     */
+    public SysUser selectUserByopenid(String openid);
     /**
      * 通过用户ID查询用户
      * 

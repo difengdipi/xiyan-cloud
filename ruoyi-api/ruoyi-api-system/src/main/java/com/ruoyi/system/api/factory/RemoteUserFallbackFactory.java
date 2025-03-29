@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * 用户服务降级处理
  * 
@@ -46,6 +48,11 @@ public class RemoteUserFallbackFactory implements FallbackFactory<RemoteUserServ
             public R<Boolean> recordUserLogin(SysUser sysUser, String source)
             {
                 return R.fail("记录用户登录信息失败:" + throwable.getMessage());
+            }
+
+            @Override
+            public R<LoginUser> getinfoByopenId(@NotBlank String openId, String source) {
+                return R.fail("根据openid查询用户登录信息失败:" + throwable.getMessage());
             }
         };
     }

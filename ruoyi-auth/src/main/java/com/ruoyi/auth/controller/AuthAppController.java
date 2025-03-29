@@ -33,7 +33,6 @@ public class AuthAppController {
     @PostMapping("/wxMin")
     public R<LoginUserVO> wxMinLogin(@RequestBody  UserLoginDTO dto) {
         log.info("小程序登录：{}",dto);
-
         return R.ok(authService.wxMinLogin(dto));
     }
 

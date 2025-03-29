@@ -56,4 +56,11 @@ public interface RemoteUserService
      */
     @PutMapping("/user/recordlogin")
     public R<Boolean> recordUserLogin(@RequestBody SysUser sysUser, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
+
+    @GetMapping("/user/wx")
+    public R<LoginUser> getinfoByopenId(@RequestParam("openId")String openId, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
+
+
 }

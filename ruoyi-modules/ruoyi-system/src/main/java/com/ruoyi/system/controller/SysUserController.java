@@ -1,5 +1,6 @@
 package com.ruoyi.system.controller;
 
+import com.ruoyi.common.core.constant.SecurityConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.poi.ExcelUtil;
@@ -98,6 +99,24 @@ public class SysUserController extends BaseController
     {
         ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
         util.importTemplateExcel(response, "用户数据");
+    }
+    @InnerAuth
+    @GetMapping("/wx")
+    public R<LoginUser> getinfoByopenId(@RequestParam String openId,@RequestHeader(SecurityConstants.FROM_SOURCE) String source){
+        SysUser sysUser = userService.selectUserByopenid(openId);
+        if (StringUtils.isNull(sysUser))
+        {
+            return R.ok(new LoginUser());
+        }
+        // 角色集合
+        Set<String> roles = permissionService.getRolePermission(sysUser);
+        // 权限集合
+        Set<String> permissions = permissionService.getMenuPermission(sysUser);
+        LoginUser sysUserVo = new LoginUser();
+        sysUserVo.setSysUser(sysUser);
+        sysUserVo.setRoles(roles);
+        sysUserVo.setPermissions(permissions);
+        return R.ok(sysUserVo);
     }
 
     /**

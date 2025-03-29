@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="deptId"       column="dept_id"      />
         <result property="userName"     column="user_name"    />
         <result property="nickName"     column="nick_name"    />
+		<result property="openId"   	column="open_id"      />
         <result property="email"        column="email"        />
         <result property="phonenumber"  column="phonenumber"  />
         <result property="sex"          column="sex"          />
@@ -146,8 +147,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<include refid="selectUserVo"/>
 			where  u.phonenumber = #{phonenumber}
 	</select>
+	<select id="selectUserByOpenId" resultType="com.ruoyi.system.api.domain.SysUser">
+		<include refid="selectUserVo"/>
+		where  u.open_id = #{openid}
+	</select>
 
-    <insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+	<insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
  		insert into sys_user(
  			<if test="userId != null and userId != 0">user_id,</if>
  			<if test="deptId != null and deptId != 0">dept_id,</if>
@@ -221,5 +226,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			#{userId}
         </foreach> 
  	</delete>
-	
+
 </mapper> 

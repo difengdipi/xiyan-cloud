@@ -1,9 +1,10 @@
 package com.ruoyi.auth;
 
+import com.ruoyi.common.security.annotation.EnableRyFeignClients;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import com.ruoyi.common.security.annotation.EnableRyFeignClients;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 认证授权中心
@@ -12,6 +13,7 @@ import com.ruoyi.common.security.annotation.EnableRyFeignClients;
  */
 @EnableRyFeignClients
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
+@EnableScheduling
 public class RuoYiAuthApplication
 {
     public static void main(String[] args)

@@ -132,4 +132,11 @@ public interface SysUserMapper
      * @return
      */
     SysUser selectUserByPhone(String phonenumber);
+
+    /**
+     * 根据openid查询用户
+     * @param openid
+     * @return
+     */
+    SysUser selectUserByOpenId(String openid);
 }

@@ -120,6 +120,16 @@ public class SysUserServiceImpl implements ISysUserService
     }
 
     /**
+     *
+     * @param openid 用户名
+     * @return
+     */
+    @Override
+    public SysUser selectUserByopenid(String openid) {
+        return userMapper.selectUserByOpenId(openid);
+    }
+
+    /**
      * 通过用户ID查询用户
      * 
      * @param userId 用户ID
