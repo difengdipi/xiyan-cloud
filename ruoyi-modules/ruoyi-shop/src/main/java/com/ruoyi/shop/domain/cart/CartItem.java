@@ -1,10 +1,7 @@
 package com.ruoyi.shop.domain.cart;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
@@ -15,6 +12,8 @@ import java.sql.Timestamp;
 @AllArgsConstructor // Generates a constructor with all parameters
 @Builder // Builder pattern for creating instances of this class
 @TableName("sys_cart_item")
+@Getter
+@Setter
 public class CartItem {
 
     @Id // Specifies the primary key of the entity

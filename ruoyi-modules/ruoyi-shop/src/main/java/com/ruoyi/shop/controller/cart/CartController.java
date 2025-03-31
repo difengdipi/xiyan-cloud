@@ -3,12 +3,14 @@ package com.ruoyi.shop.controller.cart;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.security.utils.SecurityUtils;
+import com.ruoyi.common.security.Util.DentalUtils;
 import com.ruoyi.shop.domain.cart.CartItem;
 import com.ruoyi.shop.domain.cart.dto.CartDto;
+import com.ruoyi.shop.domain.cart.dto.DeCartDto;
 import com.ruoyi.shop.domain.goods.Goods;
 import com.ruoyi.shop.domain.goods.GoodsParticulars;
 import com.ruoyi.shop.domain.goods.GoodsSkus;
+import com.ruoyi.shop.mapper.goods.GoodsParticularsMapper;
 import com.ruoyi.shop.service.cart.ICartService;
 import com.ruoyi.shop.service.goods.GoodsParticularsService;
 import com.ruoyi.shop.service.goods.GoodsService;
@@ -47,7 +49,8 @@ public class CartController {
     GoodsParticularsService goodSparticularsService;
     @Autowired
     GoodsService goodsService;
-
+    @Autowired
+    GoodsParticularsMapper goodsPartsMapper;
     @PostMapping("")
     @Operation(summary = "添加购物车")
     @Transactional
@@ -58,50 +61,66 @@ public class CartController {
         if (ObjectUtils.isEmpty(sku)) {
             return R.fail("商品已下架");
         }
-        //是否有效需要判断下单量与库存量
-        GoodsParticulars one = goodSparticularsService.getOne(new LambdaQueryWrapper<GoodsParticulars>().eq(GoodsParticulars::getSkusId, dto.getSkuId()));
-        if (one.getGoodsInventory() < dto.getCount()) {
+        if (sku.getSkuInventory() < dto.getCount()) {
             return R.fail("库存不足");
         }
+
+        GoodsParticulars one = goodsPartsMapper.selectOne(new LambdaQueryWrapper<GoodsParticulars>()
+                .like(GoodsParticulars::getSkusId, String.format(",%s,", sku.getSkuId()))
+                // 或者处理首尾情况
+                .or()
+                .likeRight(GoodsParticulars::getSkusId, sku.getSkuId() + ",")
+                .or()
+                .likeLeft(GoodsParticulars::getSkusId, "," + sku.getSkuId())
+                .or()
+                .eq(GoodsParticulars::getSkusId, sku.getSkuId())
+        );
+        log.info("GoodsParticulars:{}",one);
         //根据商品编号去查名称
         Goods goods = goodsService.getById(one.getGoodsId());
         CartItem build = CartItem.builder()
                 .skuId(dto.getSkuId())
                 .name(goods.getGoodsName())
+                .userId(DentalUtils.getUserId())
                 .picture(one.getMainPictures())
                 .price(new BigDecimal(sku.getSkuPrice()))
                 .nowPrice(new BigDecimal(sku.getSkuOldPrice()))
                 .stock(sku.getSkuInventory())
+                .count(dto.getCount())
                 .selected(false) //默认不选中
                 .attrsText("")
                 .isEffective(true).build();
+        log.info("CartItem:{}",build);
         return cartService.save(build) ? R.ok() : R.fail("添加购物车失败");
     }
     @DeleteMapping("")
     @Operation(summary = "删除购物车商品")
-    public R deleteCart(@RequestBody Long[] ids){
-        log.info("删除购物车商品:{}",ids);
-        Long userId = SecurityUtils.getUserId();
-        LambdaQueryWrapper<CartItem> eq = new LambdaQueryWrapper<CartItem>().eq(CartItem::getUserId, userId).eq(CartItem::getId, ids);
-        return cartService.remove(eq)? R.ok() : R.fail("删除失败");
+    public R deleteCart(@RequestBody DeCartDto dto){
+        log.info("删除购物车商品:{}",dto);
+        Long userId = DentalUtils.getUserId();
+        LambdaQueryWrapper<CartItem> eq = new LambdaQueryWrapper<CartItem>()
+                .eq(CartItem::getUserId, userId)
+                .in(CartItem::getSkuId, dto.getIds());
+        boolean remove = cartService.remove(eq);
+        return remove? R.ok() : R.fail("删除失败");
     }
 
     @PutMapping("/selected")
     @Operation(summary = "修改-购物车全选/取消")
-    public R selected(@RequestBody Boolean selected,@RequestBody Long[] ids){
-        log.info("修改-购物车:{}全选/取消:{}",selected,ids);
-        Long userId = SecurityUtils.getUserId();
+    public R selected(@RequestBody DeCartDto dto){
+        log.info("修改-购物车:{}全选/取消:{}",dto.getSelected(),dto.getIds());
+        Long userId = DentalUtils.getUserId();
         LambdaUpdateWrapper<CartItem> set = new LambdaUpdateWrapper<CartItem>()
                 .eq(CartItem::getUserId, userId)
-                .in(CartItem::getId, ids)
-                .set(CartItem::getSelected, selected);
+                .in(CartItem::getId, dto.getIds())
+                .set(CartItem::getSelected, dto.getSelected());
         return cartService.update(set)? R.ok() : R.fail("修改失败");
     }
 
     @GetMapping("")
     @Operation(summary = "获取-购物车列表")
     public R  getCartItemList(){
-        Long userId = SecurityUtils.getUserId();
+        Long userId = DentalUtils.getUserId();
         List<CartItem> list = cartService.list(new LambdaQueryWrapper<CartItem>().eq(CartItem::getUserId, userId));
         return R.ok(list);
     }
@@ -113,16 +132,15 @@ public class CartController {
        return R.ok("功能待上线");
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     @Operation(summary = "修改购物车商品")
     public R mergeCart(@PathVariable("id") Long id,@RequestBody CartDto dto){
-        Long userId = SecurityUtils.getUserId();
+        Long userId = DentalUtils.getUserId();
         LambdaUpdateWrapper<CartItem> set = new LambdaUpdateWrapper<CartItem>().eq(CartItem::getUserId, userId).eq(CartItem::getSkuId, id)
-                .set(CartItem::getCount, dto.getCount())
-                .set(CartItem::getSelected, dto.getSelected());
+                .set(CartItem::getCount, dto.getCount() == null ? 1 : dto.getCount())
+                .set(CartItem::getSelected, dto.getSelected() == null ? false : dto.getSelected());
         cartService.update(set);
         return cartService.update(set)? R.ok() : R.fail("修改失败");
-
     }
 
 }

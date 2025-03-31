@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.bean.BeanUtils;
+import com.ruoyi.shop.config.Utils;
 import com.ruoyi.shop.controller.address.AddressController;
 import com.ruoyi.shop.domain.goods.*;
 import com.ruoyi.shop.mapper.goods.GoodsSkusMapper;
@@ -110,6 +111,8 @@ public class GoodsController {
     private GoodsPropertyService goodsPropertiesService;
     @Autowired
     private GoodsValueMapper goodsValueMapper;
+    @Autowired
+    private  SkusSpecService skusSpecService;
     @Operation(summary = "按照商品详情编号联表查询数据")
     @GetMapping(value = "")
     public R getGoodsByIds(@RequestParam("id") Integer id) {
@@ -122,8 +125,18 @@ public class GoodsController {
         BeanUtils.copyProperties(goodsParticularsVo, goodsParticulars);
         List<GoodsSkus> goodsSkuses = goodsSkusMapper
                 .selectList(new LambdaQueryWrapper<GoodsSkus>()
-                        .eq(GoodsSkus::getSkuId, goodsParticulars.getSkusId()
+                        .in(GoodsSkus::getSkuId, Utils.split(goodsParticulars.getSkusId())
                         ));
+        List<GoodsSkusVo> goodsSkusesVo = new ArrayList<>();
+        //赋值
+        for(GoodsSkus goodsSkus : goodsSkuses){
+            GoodsSkusVo goodsSkusVo = new GoodsSkusVo();
+
+            SkusSpec byId = skusSpecService.getById(goodsSkus.getSkuSpecsId());
+            BeanUtils.copyProperties(goodsSkus,goodsSkusVo);
+            goodsSkusVo.setSkusSpec(byId);
+            goodsSkusesVo.add(goodsSkusVo);
+        }
 
         GoodsSpec goodsSpecs = goodsSpecMapper.selectById(goodsParticulars.getSpecId());
 
@@ -161,7 +174,7 @@ public class GoodsController {
                 .goodsDetails(goodsDetailsVo)
                 .mainPictures(mainPic)
                 .goodsBrand(brand)
-                .goodsSkus(goodsSkuses)
+                .goodsSkus(goodsSkusesVo)
                 .goodsSpec(goodsSpecsVo)
                 .addressList(addressController.getAddressList().getData())
                 .build();

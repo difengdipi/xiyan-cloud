@@ -26,7 +26,7 @@ public class GoodsParticularsVo {
 
     // 同样地，如果 GoodsSpecVo, GoodsSkus, PccVos, GoodsDetailsVo 不需要去掉前缀，则保留原样或根据需要调整
     private List<GoodsSpecVo> goodsSpec;
-    private List<GoodsSkus> goodsSkus;
+    private List<GoodsSkusVo> goodsSkus;
 
     private List<String> mainPictures;
     private PccVos category;

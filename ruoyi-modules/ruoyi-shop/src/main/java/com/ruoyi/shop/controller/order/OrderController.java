@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @Version :
  **/
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/member/order")
 public class OrderController {
 }
