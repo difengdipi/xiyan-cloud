@@ -94,7 +94,7 @@ public class AddressController {
             //将现在的设为收货地址
         }
         boolean success = addressService.updateById(address);
-        return R.ok(success ? "修改成功" : "修改失败");
+        return R.ok(success ?addressService.getById(id) : "修改失败");
     }
 
     // 删除收货地址

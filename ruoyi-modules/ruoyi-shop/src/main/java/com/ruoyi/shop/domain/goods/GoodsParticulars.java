@@ -2,6 +2,7 @@ package com.ruoyi.shop.domain.goods;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@TableName("sys_goods_particulars")
 public class GoodsParticulars {
     @TableId(type = IdType.AUTO)
     private Integer particularsId;
@@ -21,8 +23,6 @@ public class GoodsParticulars {
     private Integer salesCount;
     private Double collectCount;
     private String mainVideos;
-
-
     private String mainPictures;
     private Integer categoryId;
     private Integer detailsId;

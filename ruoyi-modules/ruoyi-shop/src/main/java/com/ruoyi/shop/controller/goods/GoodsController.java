@@ -123,6 +123,7 @@ public class GoodsController {
         GoodsBrand brand = goodsBrandService.getOne(new LambdaQueryWrapper<GoodsBrand>().eq(GoodsBrand::getBrandId, goodsParticulars.getBrandId()));
         GoodsParticularsVo goodsParticularsVo = new GoodsParticularsVo();
         BeanUtils.copyProperties(goodsParticularsVo, goodsParticulars);
+
         List<GoodsSkus> goodsSkuses = goodsSkusMapper
                 .selectList(new LambdaQueryWrapper<GoodsSkus>()
                         .in(GoodsSkus::getSkuId, Utils.split(goodsParticulars.getSkusId())
@@ -131,18 +132,16 @@ public class GoodsController {
         //赋值
         for(GoodsSkus goodsSkus : goodsSkuses){
             GoodsSkusVo goodsSkusVo = new GoodsSkusVo();
-
             SkusSpec byId = skusSpecService.getById(goodsSkus.getSkuSpecsId());
             BeanUtils.copyProperties(goodsSkus,goodsSkusVo);
             goodsSkusVo.setSkusSpec(byId);
             goodsSkusesVo.add(goodsSkusVo);
         }
 
+
         GoodsSpec goodsSpecs = goodsSpecMapper.selectById(goodsParticulars.getSpecId());
-
-        List<String> valueIdList = Arrays.stream(goodsSpecs.getSpecValues().split(",")).collect(Collectors.toList());
-
-        List<GoodsValue> goodsValues = goodsValueMapper.selectList(new LambdaQueryWrapper<GoodsValue>().in(GoodsValue::getValueId, valueIdList));
+        List<GoodsValue> goodsValues = goodsValueMapper.selectList(new LambdaQueryWrapper<GoodsValue>()
+                .in(GoodsValue::getValueId, Utils.split(goodsSpecs.getSpecValues())));
 
         List<GoodsSpecVo> goodsSpecsVo = new ArrayList<>();
         GoodsSpecVo build = GoodsSpecVo.builder()

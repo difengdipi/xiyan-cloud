@@ -22,6 +22,7 @@ public class CartItem {
     private Long skuId; // SKU ID
 
     private Long userId; // 下单用户 ID
+    private Integer goodsId; // 下单用户 ID
 
     private String name; // 商品名称
 

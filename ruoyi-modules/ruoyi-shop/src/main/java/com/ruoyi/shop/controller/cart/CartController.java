@@ -80,6 +80,7 @@ public class CartController {
         Goods goods = goodsService.getById(one.getGoodsId());
         CartItem build = CartItem.builder()
                 .skuId(dto.getSkuId())
+                .goodsId(goods.getGoodsId())
                 .name(goods.getGoodsName())
                 .userId(DentalUtils.getUserId())
                 .picture(one.getMainPictures())
@@ -137,8 +138,10 @@ public class CartController {
     public R mergeCart(@PathVariable("id") Long id,@RequestBody CartDto dto){
         Long userId = DentalUtils.getUserId();
         LambdaUpdateWrapper<CartItem> set = new LambdaUpdateWrapper<CartItem>().eq(CartItem::getUserId, userId).eq(CartItem::getSkuId, id)
-                .set(CartItem::getCount, dto.getCount() == null ? 1 : dto.getCount())
-                .set(CartItem::getSelected, dto.getSelected() == null ? false : dto.getSelected());
+                .set(CartItem::getSelected, !dto.getSelected() ? false : dto.getSelected());
+        if(dto.getCount() != null){
+            set.set(CartItem::getCount,dto.getCount());
+        }
         cartService.update(set);
         return cartService.update(set)? R.ok() : R.fail("修改失败");
     }
