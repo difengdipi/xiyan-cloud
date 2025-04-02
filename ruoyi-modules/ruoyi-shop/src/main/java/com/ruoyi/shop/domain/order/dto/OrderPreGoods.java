@@ -1,6 +1,6 @@
 package com.ruoyi.shop.domain.order.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -12,6 +12,11 @@ import java.math.BigDecimal;
  * @Version :
  **/
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class OrderPreGoods {
 
     /**

@@ -5,7 +5,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data // Lombok annotation for generating all the getters/setters, toString, etc.
 @NoArgsConstructor // Generates a constructor with no parameters
@@ -42,7 +42,7 @@ public class CartItem {
 
     private Boolean isEffective; // 是否为有效商品，默认值为TRUE
 
-    private Timestamp createdTime; // 创建时间
+    private LocalDateTime createdTime; // 创建时间
 
-    private Timestamp updatedTime; // 更新时间
+    private LocalDateTime updatedTime; // 更新时间
 }

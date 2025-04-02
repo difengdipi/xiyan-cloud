@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -22,6 +22,6 @@ public class EvaluationInfo {
     private String evaluationInfoPictures;
     private String officialReply;
     private Integer praiseCount;
-    private Date createTime;
+    private LocalDateTime createTime;
     private Double praisePercent;
 }

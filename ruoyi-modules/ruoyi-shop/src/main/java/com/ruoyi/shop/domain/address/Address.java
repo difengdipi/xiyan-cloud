@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 收货地址实体类
@@ -27,7 +27,6 @@ public class Address {
     private String provinceCode; // 省份编码
 
     private String cityCode; // 城市编码
-
     private String countyCode; // 区/县编码
     private String fullLocation; // 省市区
     private String address; // 详细地址
@@ -35,7 +34,7 @@ public class Address {
     private Integer isDefault; // 是否默认地址, 1为是，0为否
     //时间格式
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createTime; // 创建时间
+    private LocalDateTime createTime; // 创建时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateTime; // 更新时间
+    private LocalDateTime updateTime; // 更新时间
 }

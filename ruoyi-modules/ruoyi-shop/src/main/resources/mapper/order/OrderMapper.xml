@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.shop.mapper.order.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.shop.domain.order.Order">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
+        <result property="addressId" column="address_id" jdbcType="BIGINT"/>
+        <result property="deliveryTimeType" column="delivery_time_type" jdbcType="TINYINT"/>
+        <result property="buyerMessage" column="buyer_message" jdbcType="VARCHAR"/>
+        <result property="payChannel" column="pay_channel" jdbcType="TINYINT"/>
+        <result property="payType" column="pay_type" jdbcType="TINYINT"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="orderResultMap" type="com.ruoyi.shop.domain.order.vo.OrderResultVo">
+        <!-- 订单基本信息 -->
+        <id property="id" column="id"/>
+        <result property="orderState" column="order_state"/>
+        <result property="countdown" column="countdown"/>
+        <result property="receiverContact" column="receiver_contact"/>
+        <result property="receiverMobile" column="receiver_mobile"/>
+        <result property="receiverAddress" column="receiver_address"/>
+        <result property="createTime" column="create_time"/>
+        <result property="totalMoney" column="total_money"/>
+        <result property="postFee" column="post_fee"/>
+        <result property="payMoney" column="pay_money"/>
+
+        <!-- 商品集合映射 -->
+        <collection property="skus" ofType="com.ruoyi.shop.domain.order.vo.OrderSkuVo">
+            <id property="id" column="sku_id"/>
+            <result property="spuId" column="spu_id"/>
+            <result property="name" column="sku_name"/>
+            <result property="attrsText" column="attrs_text"/>
+            <result property="quantity" column="quantity"/>
+            <result property="curPrice" column="cur_price"/>
+            <result property="image" column="sku_image"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectOrderState" resultMap="orderResultMap">
+        SELECT
+            order1.id,
+            info.order_state,
+            info.countdown,
+            info.receiver_contact,
+            info.receiver_mobile,
+            info.receiver_address,
+            info.create_time,
+            info.total_money,
+            info.post_fee,
+            info.pay_money,
+            sku.id AS sku_id,
+            sku.spu_id,
+            sku.name AS sku_name,
+            sku.attrs_text,
+            sku.quantity,
+            sku.cur_price,
+            sku.image AS sku_image
+        FROM
+            sys_order AS order1
+                LEFT JOIN sys_order_info AS info ON order1.id = info.order_id
+                LEFT JOIN sys_order_sku AS sku ON order1.id = sku.order_id
+        <where>
+            order1.user_id = #{userId}
+            <if test="orderState != 0">
+                AND  info.order_state = #{orderState}
+            </if>
+        </where>
+    </select>
+</mapper>
