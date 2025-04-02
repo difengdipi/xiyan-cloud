@@ -32,7 +32,6 @@ public class AuthAppController {
      */
     @PostMapping("/wxMin")
     public R<LoginUserVO> wxMinLogin(@RequestBody  UserLoginDTO dto) {
-        log.info("小程序登录：{}",dto);
         return R.ok(authService.wxMinLogin(dto));
     }
 
@@ -41,7 +40,6 @@ public class AuthAppController {
      */
     @PostMapping("/wxMin/simple")
     public R<LoginUserVO> wxMinSimpleLogin(@RequestBody @Valid WxMinSimpleLoginDTO loginParams) {
-        log.info("小程序登录_内测版：{}",loginParams.getPhoneNumber());
         return R.ok(authService.wxMinSimpleLogin(loginParams.getPhoneNumber()));
     }
 
@@ -50,7 +48,6 @@ public class AuthAppController {
      */
     @PostMapping
     public R<LoginUserVO> login(@RequestBody @Valid LoginBody form ) {
-        log.info("小程序登录_内测版：{}",form);
         return R.ok(authService.Applogin(form.getUsername(), form.getPassword()));
     }
 }
