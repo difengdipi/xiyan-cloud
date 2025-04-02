@@ -82,7 +82,6 @@ public class AddressController {
     @PutMapping("/{id}")
     @Operation(summary = "修改收货地址")
     public R updateAddress(@PathVariable("id") Integer id, @RequestBody Address address) {
-        //TODO:设置默认收货地址
         address.setId(id);
         Long userId = DentalUtils.getUserId();
         if(address.getIsDefault() == 1){

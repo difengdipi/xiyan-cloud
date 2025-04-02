@@ -188,7 +188,7 @@ public class TokenService
     }
 
     /**
-     * 刷新令牌有效期  TODO：这里存储的方式与之前的模块定义的不一致，需要修改
+     * 刷新令牌有效期
      *
      * @param loginUser 登录信息
      */
