@@ -1,6 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.api.domain.SysUser;
+import com.ruoyi.system.api.domain.profile.ProfileDetail;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -139,4 +140,6 @@ public interface SysUserMapper
      * @return
      */
     SysUser selectUserByOpenId(String openid);
+
+    void updateAppUser(ProfileDetail profileDetail);
 }

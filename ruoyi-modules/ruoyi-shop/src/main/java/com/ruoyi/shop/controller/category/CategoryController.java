@@ -51,8 +51,8 @@ public class CategoryController {
 
     @Operation(summary = "删除分类数据")
     @DeleteMapping(value = "/deleteCategory/{id}")
-    public R deleteCategory(@PathVariable("id") Integer bannerId) {
-        boolean flag = categoryService.removeById(bannerId);
+    public R deleteCategory(@PathVariable("id") Integer id) {
+        boolean flag = categoryService.removeById(id);
         if (flag) {
             return R.ok("删除分类成功");
         } else {
@@ -62,8 +62,8 @@ public class CategoryController {
 
     @Operation(summary = "按照分类编号查询数据")
     @GetMapping(value = "/getCategoryById/{id}")
-    public R getByIdCategory(@PathVariable("id") Integer bannerId) {
-        Category category = categoryService.getById(bannerId);
+    public R getByIdCategory(@PathVariable("id") Integer id) {
+        Category category = categoryService.getById(id);
         return R.ok(category);
     }
 

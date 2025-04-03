@@ -46,6 +46,13 @@ public interface RemoteWxService {
     @GetMapping("/cgi-bin/token")
     public String getWxAccessToken( @RequestParam("grant_type") String grant_type,@RequestParam("appid") String appid, @RequestParam("secret") String secret);
 
+    /**
+     * 获取微信服务中的用户信息
+     * @param access_token
+     * @param openid
+     * @param lang
+     * @return
+     */
     @GetMapping("/sns/userinfo")
     public String getUserInfo(@RequestParam("access_token") String access_token,@RequestParam("openid") String openid,@RequestParam("lang") String lang);
 

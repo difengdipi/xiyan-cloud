@@ -4,6 +4,7 @@ import com.ruoyi.common.core.constant.SecurityConstants;
 import com.ruoyi.common.core.constant.ServiceNameConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.api.domain.SysUser;
+import com.ruoyi.system.api.domain.profile.ProfileDetail;
 import com.ruoyi.system.api.factory.RemoteUserFallbackFactory;
 import com.ruoyi.system.api.model.LoginUser;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -34,7 +35,6 @@ public interface RemoteUserService
      * @param source 请求来源
      * @return 结果
      */
-
     @GetMapping("/user/Userinfo/{phone}")
     public R<LoginUser> getinfoByphone(@PathVariable("phone") String phone,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
     /**
@@ -57,10 +57,23 @@ public interface RemoteUserService
     @PutMapping("/user/recordlogin")
     public R<Boolean> recordUserLogin(@RequestBody SysUser sysUser, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
-
+    /**
+     * 根据openid获取用户登录信息
+     * @param openId
+     * @param source
+     * @return
+     */
     @GetMapping("/user/wx")
     public R<LoginUser> getinfoByopenId(@RequestParam("openId")String openId, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
-
-
+    /**
+     * 根据用户id获取用户信息
+     * @param id
+     * @param source
+     * @return
+     */
+    @GetMapping("/user/getUserInfo/{id}")
+    public R<SysUser> getAppUserInfo(@PathVariable("id") Long id,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+    @PutMapping("/user/UserInfo")
+    public R<SysUser> updateAppUserInfo(@RequestBody ProfileDetail profileDetail,@RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 }

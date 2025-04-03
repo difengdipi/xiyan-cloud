@@ -65,16 +65,14 @@ public class WxConfig {
             if (lock.tryLock(5,60, TimeUnit.SECONDS)) {
                 if (redisService.hasKey(Tokenkey) && redisService.getExpire(Tokenkey) > this.expireTime) {
                     this.access_key = redisService.getCacheObject(Tokenkey);
-                    log.info("微信配置初始化成功");
                     return;
                 }
-                log.info("微信配置初始化开始");
                 String AccessToken = remoteWxService.getWxAccessToken(this.AcckeyGrantType, this.appid, this.secret);
                 WxAccessToken wxAccessToken = JSONObject.parseObject(AccessToken, WxAccessToken.class);
-
                 this.access_key = wxAccessToken.getAccessToken();
                 log.info("access_key为:{}", access_key);
                 redisService.setCacheObject(Tokenkey, wxAccessToken.getAccessToken(),wxAccessToken.getExpiresIn(), TimeUnit.SECONDS);
+                log.info("微信初始化成功");
             }
         }catch (Exception e){
             log.error("微信配置初始化失败");
@@ -90,18 +88,17 @@ public class WxConfig {
         try {
             if (lock.tryLock(5,30, TimeUnit.SECONDS)) {
                 if (redisService.hasKey(Tokenkey) && redisService.getExpire(Tokenkey) > this.expireTime) {
-                    log.info("刷新token不需要");
                     this.access_key = redisService.getCacheObject(Tokenkey);
                     return;
                 }
-                log.info("定时刷新微信服务acckeytoken开始");
                 String AccessToken = remoteWxService.getWxAccessToken(this.AcckeyGrantType, this.appid, this.secret);
                 WxAccessToken wxAccessToken = JSONObject.parseObject(AccessToken, WxAccessToken.class);
                 this.access_key = wxAccessToken.getAccessToken();
                 redisService.setCacheObject(Tokenkey, wxAccessToken.getAccessToken(),wxAccessToken.getExpiresIn(), TimeUnit.SECONDS);
+                log.info("刷新微信服务成功");
             }
         }catch (Exception e){
-            log.error("定时刷新微信服务acckeytoken开始失败");
+            log.error("刷新微信服务开始失败");
         }
     }
 }

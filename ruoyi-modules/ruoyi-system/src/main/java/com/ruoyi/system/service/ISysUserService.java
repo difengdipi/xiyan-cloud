@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.api.domain.SysUser;
+import com.ruoyi.system.api.domain.profile.ProfileDetail;
 
 import java.util.List;
 
@@ -214,4 +216,6 @@ public interface ISysUserService
      * 根据手机号获取当前用户信息
      */
     SysUser     selectUserByPhone(String phone);
+
+    R<SysUser> updateAppUser(ProfileDetail profileDetail);
 }

@@ -3,6 +3,7 @@ package com.ruoyi.system.api.factory;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.api.RemoteUserService;
 import com.ruoyi.system.api.domain.SysUser;
+import com.ruoyi.system.api.domain.profile.ProfileDetail;
 import com.ruoyi.system.api.model.LoginUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,17 @@ public class RemoteUserFallbackFactory implements FallbackFactory<RemoteUserServ
             @Override
             public R<LoginUser> getinfoByopenId(@NotBlank String openId, String source) {
                 return R.fail("根据openid查询用户登录信息失败:" + throwable.getMessage());
+            }
+
+            @Override
+            public R<SysUser> getAppUserInfo(Long id, String source) {
+                return R.fail("根据用户id查询用户登录信息失败:" + throwable.getMessage());
+
+            }
+
+            @Override
+            public R<SysUser> updateAppUserInfo(ProfileDetail profileDetail, String source) {
+                return R.fail("更新小程序用户信息失败:" + throwable.getMessage());
             }
         };
     }

@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.core.constant.SecurityConstants;
 import com.ruoyi.common.core.constant.UserConstants;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.exception.ServiceException;
 import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -11,6 +12,7 @@ import com.ruoyi.common.security.utils.SecurityUtils;
 import com.ruoyi.system.api.RemoteDentalService;
 import com.ruoyi.system.api.domain.SysRole;
 import com.ruoyi.system.api.domain.SysUser;
+import com.ruoyi.system.api.domain.profile.ProfileDetail;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.domain.SysUserRole;
@@ -581,6 +583,20 @@ public class SysUserServiceImpl implements ISysUserService
      */
     public SysUser selectUserByPhone(String phone) {
         return userMapper.selectUserByPhone(phone);
+    }
+
+    /**
+     * 更新用户信息
+     * @param profileDetail
+     * @return
+     */
+    @Override
+    public R<SysUser> updateAppUser(ProfileDetail profileDetail) {
+        if(profileDetail.getId() == null){
+            return R.fail();
+        }
+        userMapper.updateAppUser(profileDetail);
+        return R.ok(userMapper.selectUserById(profileDetail.getId()));
     }
 
 }

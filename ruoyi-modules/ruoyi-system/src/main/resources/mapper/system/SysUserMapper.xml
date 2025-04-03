@@ -215,8 +215,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<update id="resetUserPwd" parameterType="SysUser">
  		update sys_user set password = #{password} where user_name = #{userName}
 	</update>
-	
-	<delete id="deleteUserById" parameterType="Long">
+    <update id="updateAppUser">
+		update sys_user
+			<set>
+				<if test="avatar != null and avatar != ''">
+					avatar = #{avatar},
+				</if>
+				<if test="account != null and account != ''">
+					user_name = #{account},
+				</if>
+				<if test="nickname != null and nickname != ''">
+					nick_name = #{nickname},
+				</if>
+				<if test="gender != null and gender != ''">
+					sex = #{gender},
+				</if>
+			</set>
+	   where user_id = #{id}
+	</update>
+
+    <delete id="deleteUserById" parameterType="Long">
  		update sys_user set del_flag = '2' where user_id = #{userId}
  	</delete>
  	

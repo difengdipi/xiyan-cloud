@@ -16,6 +16,7 @@ import com.ruoyi.common.security.utils.SecurityUtils;
 import com.ruoyi.system.api.domain.SysDept;
 import com.ruoyi.system.api.domain.SysRole;
 import com.ruoyi.system.api.domain.SysUser;
+import com.ruoyi.system.api.domain.profile.ProfileDetail;
 import com.ruoyi.system.api.model.LoginUser;
 import com.ruoyi.system.service.*;
 import org.apache.commons.lang3.ArrayUtils;
@@ -382,5 +383,25 @@ public class SysUserController extends BaseController
     public AjaxResult deptTree(SysDept dept)
     {
         return success(deptService.selectDeptTreeList(dept));
+    }
+
+
+    @InnerAuth
+    @GetMapping("/getUserInfo/{id}")
+    public R<SysUser> getAppUserInfo(@PathVariable("id") Long id){
+        //根据用户id获取用户信息
+        SysUser sysUser = userService.selectUserById(id);
+        return R.ok(sysUser);
+    }
+
+
+    @InnerAuth
+    @PutMapping("/UserInfo")
+    public R<SysUser> updateAppUserInfo(@RequestBody ProfileDetail profileDetail){
+        /**
+         * 更新用户信息
+         */
+        return userService.updateAppUser(profileDetail);
+
     }
 }
