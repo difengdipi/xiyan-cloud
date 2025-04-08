@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.dental.mapper.DoctorSchedulesMapper">
+    
+    <resultMap type="com.ruoyi.dental.domain.DoctorSchedules" id="DoctorSchedulesResult">
+        <result property="id"    column="id"    />
+        <result property="doctorId"    column="doctor_id"    />
+        <result property="date"    column="date"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="appNum"    column="app_num"    />
+    </resultMap>
+
+    <sql id="selectDoctorSchedulesVo">
+        select id, doctor_id, date, status, create_time, update_time, app_num from tb_doctor_schedules
+    </sql>
+
+    <select id="selectDoctorSchedulesList" parameterType="com.ruoyi.dental.domain.DoctorSchedules" resultMap="DoctorSchedulesResult">
+        <include refid="selectDoctorSchedulesVo"/>
+        <where>  
+            <if test="doctorId != null "> and doctor_id = #{doctorId}</if>
+            <if test="date != null "> and date = #{date}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="appNum != null "> and app_num = #{appNum}</if>
+        </where>
+    </select>
+    
+    <select id="selectDoctorSchedulesById" parameterType="Long" resultMap="DoctorSchedulesResult">
+        <include refid="selectDoctorSchedulesVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertDoctorSchedules" parameterType="com.ruoyi.dental.domain.DoctorSchedules">
+        insert into tb_doctor_schedules
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="doctorId != null">doctor_id,</if>
+            <if test="date != null">date,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="appNum != null">app_num,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="doctorId != null">#{doctorId},</if>
+            <if test="date != null">#{date},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="appNum != null">#{appNum},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDoctorSchedules" parameterType="com.ruoyi.dental.domain.DoctorSchedules">
+        update tb_doctor_schedules
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="doctorId != null">doctor_id = #{doctorId},</if>
+            <if test="date != null">date = #{date},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="appNum != null">app_num = #{appNum},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDoctorSchedulesById" parameterType="Long">
+        delete from tb_doctor_schedules where id = #{id}
+    </delete>
+
+    <delete id="deleteDoctorSchedulesByIds" parameterType="String">
+        delete from tb_doctor_schedules where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

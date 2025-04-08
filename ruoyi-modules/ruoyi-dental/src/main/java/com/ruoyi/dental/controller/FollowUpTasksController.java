@@ -9,6 +9,8 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.dental.domain.FollowUpTasks;
 import com.ruoyi.dental.service.IFollowUpTasksService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/tasks")
+@Tag(name = "跟进任务")
 public class FollowUpTasksController extends BaseController
 {
     @Autowired
@@ -33,6 +36,7 @@ public class FollowUpTasksController extends BaseController
      */
     @RequiresPermissions("system:tasks:list")
     @GetMapping("/list")
+    @Operation(summary = "查询跟进任务列表")
     public TableDataInfo list(FollowUpTasks followUpTasks)
     {
         startPage();
@@ -46,6 +50,7 @@ public class FollowUpTasksController extends BaseController
     @RequiresPermissions("system:tasks:export")
     @Log(title = "跟进任务", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
+    @Operation(summary = "导出跟进任务列表")
     public void export(HttpServletResponse response, FollowUpTasks followUpTasks)
     {
         List<FollowUpTasks> list = followUpTasksService.selectFollowUpTasksList(followUpTasks);
@@ -58,6 +63,7 @@ public class FollowUpTasksController extends BaseController
      */
     @RequiresPermissions("system:tasks:query")
     @GetMapping(value = "/{taskId}")
+    @Operation(summary = "获取跟进任务详细信息")
     public AjaxResult getInfo(@PathVariable("taskId") Long taskId)
     {
         return success(followUpTasksService.selectFollowUpTasksByTaskId(taskId));
@@ -69,6 +75,7 @@ public class FollowUpTasksController extends BaseController
     @RequiresPermissions("system:tasks:add")
     @Log(title = "跟进任务", businessType = BusinessType.INSERT)
     @PostMapping
+    @Operation(summary = "新增跟进任务")
     public AjaxResult add(@RequestBody FollowUpTasks followUpTasks)
     {
         return toAjax(followUpTasksService.insertFollowUpTasks(followUpTasks));
@@ -80,6 +87,7 @@ public class FollowUpTasksController extends BaseController
     @RequiresPermissions("system:tasks:edit")
     @Log(title = "跟进任务", businessType = BusinessType.UPDATE)
     @PutMapping
+    @Operation(summary = "修改跟进任务")
     public AjaxResult edit(@RequestBody FollowUpTasks followUpTasks)
     {
         return toAjax(followUpTasksService.updateFollowUpTasks(followUpTasks));
@@ -91,6 +99,7 @@ public class FollowUpTasksController extends BaseController
     @RequiresPermissions("system:tasks:remove")
     @Log(title = "跟进任务", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{taskIds}")
+    @Operation(summary = "删除跟进任务")
     public AjaxResult remove(@PathVariable Long[] taskIds)
     {
         return toAjax(followUpTasksService.deleteFollowUpTasksByTaskIds(taskIds));

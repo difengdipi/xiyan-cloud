@@ -10,12 +10,12 @@ import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.InnerAuth;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
+import com.ruoyi.dental.domain.DoctorSchedules;
 import com.ruoyi.dental.domain.Doctors;
 import com.ruoyi.dental.domain.UserAppInfo;
-import com.ruoyi.dental.domain.doctorSchedules;
+import com.ruoyi.dental.service.IDoctorSchedulesService;
 import com.ruoyi.dental.service.IDoctorsService;
 import com.ruoyi.dental.service.IUserAppInfoService;
-import com.ruoyi.dental.service.IdoctorSchedules;
 import com.ruoyi.system.api.domain.SysUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -138,14 +138,14 @@ public class DoctorsController extends BaseController
         return  R.ok(doctors);
     }
     @Autowired
-    IdoctorSchedules doctorSchedulesService;
+    IDoctorSchedulesService doctorSchedulesService;
     @Operation(summary = "根据医生id获取医生未来两周的时间安排表")
     @GetMapping("/AppointSchedule/{id}")
     public R getAppointmentSchedule(@PathVariable("id")Long id)
     {
-        List<doctorSchedules> list = doctorSchedulesService.list(
-                new LambdaQueryWrapper<doctorSchedules>().eq(doctorSchedules::getDoctorId,id)
-                        .gt(doctorSchedules::getDate,new Date())
+        List<DoctorSchedules> list = doctorSchedulesService.list(
+                new LambdaQueryWrapper<DoctorSchedules>().eq(DoctorSchedules::getDoctorId,id)
+                        .gt(DoctorSchedules::getDate,new Date())
         );
         return R.ok(list);
     }

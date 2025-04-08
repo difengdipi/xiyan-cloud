@@ -20,4 +20,51 @@ public interface UserAppInfoMapper extends BaseMapper<UserAppInfo> {
     List<AppNumVo> getDoctorAppNum();
 
     List<AppDetailVo> AppDetailVolsit(Long userId);
+    /**
+     * 查询预约
+     *
+     * @param id 预约主键
+     * @return 预约
+     */
+    public UserAppInfo selectUserAppInfoById(Long id);
+
+    /**
+     * 查询预约列表
+     *
+     * @param userAppInfo 预约
+     * @return 预约集合
+     */
+    public List<UserAppInfo> selectUserAppInfoList(UserAppInfo userAppInfo);
+
+    /**
+     * 新增预约
+     *
+     * @param userAppInfo 预约
+     * @return 结果
+     */
+    public int insertUserAppInfo(UserAppInfo userAppInfo);
+
+    /**
+     * 修改预约
+     *
+     * @param userAppInfo 预约
+     * @return 结果
+     */
+    public int updateUserAppInfo(UserAppInfo userAppInfo);
+
+    /**
+     * 删除预约
+     *
+     * @param id 预约主键
+     * @return 结果
+     */
+    public int deleteUserAppInfoById(Long id);
+
+    /**
+     * 批量删除预约
+     *
+     * @param ids 需要删除的数据主键集合
+     * @return 结果
+     */
+    public int deleteUserAppInfoByIds(Long[] ids);
 }

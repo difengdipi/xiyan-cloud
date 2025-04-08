@@ -9,6 +9,7 @@ import com.ruoyi.dental.service.IUserAppInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,6 +23,81 @@ import java.util.List;
 public class UserAppInfoServiceImpl extends ServiceImpl<UserAppInfoMapper, UserAppInfo> implements IUserAppInfoService {
     @Autowired
     UserAppInfoMapper userAppInfoMapper;
+
+
+    /**
+     * 查询预约
+     *
+     * @param id 预约主键
+     * @return 预约
+     */
+    @Override
+    public UserAppInfo selectUserAppInfoById(Long id)
+    {
+        return userAppInfoMapper.selectUserAppInfoById(id);
+    }
+
+    /**
+     * 查询预约列表
+     *
+     * @param userAppInfo 预约
+     * @return 预约
+     */
+    @Override
+    public List<UserAppInfo> selectUserAppInfoList(UserAppInfo userAppInfo)
+    {
+        return userAppInfoMapper.selectUserAppInfoList(userAppInfo);
+    }
+
+    /**
+     * 新增预约
+     *
+     * @param userAppInfo 预约
+     * @return 结果
+     */
+    @Override
+    public int insertUserAppInfo(UserAppInfo userAppInfo)
+    {
+        userAppInfo.setCreateTime(new Date());
+        return userAppInfoMapper.insertUserAppInfo(userAppInfo);
+    }
+
+    /**
+     * 修改预约
+     *
+     * @param userAppInfo 预约
+     * @return 结果
+     */
+    @Override
+    public int updateUserAppInfo(UserAppInfo userAppInfo)
+    {
+        userAppInfo.setUpdateTime(new Date());
+        return userAppInfoMapper.updateUserAppInfo(userAppInfo);
+    }
+
+    /**
+     * 批量删除预约
+     *
+     * @param ids 需要删除的预约主键
+     * @return 结果
+     */
+    @Override
+    public int deleteUserAppInfoByIds(Long[] ids)
+    {
+        return userAppInfoMapper.deleteUserAppInfoByIds(ids);
+    }
+
+    /**
+     * 删除预约信息
+     *
+     * @param id 预约主键
+     * @return 结果
+     */
+    @Override
+    public int deleteUserAppInfoById(Long id)
+    {
+        return userAppInfoMapper.deleteUserAppInfoById(id);
+    }
     @Override
     public List<AppNumVo> getDoctorAppNum() {
         return userAppInfoMapper.getDoctorAppNum();

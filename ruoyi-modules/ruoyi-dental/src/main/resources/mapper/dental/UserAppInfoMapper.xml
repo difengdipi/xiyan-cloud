@@ -4,6 +4,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.dental.mapper.UserAppInfoMapper">
 
+    <resultMap type="com.ruoyi.dental.domain.UserAppInfo" id="UserAppInfoResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="scheduleId"    column="schedule_id"    />
+        <result property="doctorId"    column="doctor_id"    />
+        <result property="name"    column="name"    />
+        <result property="status"    column="status"    />
+        <result property="appStatus"    column="app_status"    />
+        <result property="phone"    column="phone"    />
+        <result property="idcard"    column="idcard"    />
+        <result property="cancelReason"    column="cancel_reason"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
     <select id="getDoctorAppNum" resultType="com.ruoyi.dental.domain.vo.AppNumVo" >
         select docker_id as doctorId,count(docker_id) as num
         from tb_user_app_info
@@ -34,4 +49,88 @@
         ORDER BY
             tb_user_app_info.update_time DESC
     </select>
+
+
+    <sql id="selectUserAppInfoVo">
+        select id, user_id, schedule_id, doctor_id, name, status, app_status, phone, idcard, cancel_reason, create_time, update_time from tb_user_app_info
+    </sql>
+
+    <select id="selectUserAppInfoList" parameterType="com.ruoyi.dental.domain.UserAppInfo" resultMap="UserAppInfoResult">
+        <include refid="selectUserAppInfoVo"/>
+        <where>
+            <if test="scheduleId != null "> and schedule_id = #{scheduleId}</if>
+            <if test="doctorId != null "> and doctor_id = #{doctorId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="appStatus != null "> and app_status = #{appStatus}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="cancelReason != null  and cancelReason != ''"> and cancel_reason = #{cancelReason}</if>
+        </where>
+    </select>
+
+    <select id="selectUserAppInfoById" parameterType="Long" resultMap="UserAppInfoResult">
+        <include refid="selectUserAppInfoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertUserAppInfo" parameterType="com.ruoyi.dental.domain.UserAppInfo">
+        insert into tb_user_app_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="scheduleId != null">schedule_id,</if>
+            <if test="doctorId != null">doctor_id,</if>
+            <if test="name != null">name,</if>
+            <if test="status != null">status,</if>
+            <if test="appStatus != null">app_status,</if>
+            <if test="phone != null">phone,</if>
+            <if test="idcard != null">idcard,</if>
+            <if test="cancelReason != null">cancel_reason,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="scheduleId != null">#{scheduleId},</if>
+            <if test="doctorId != null">#{doctorId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="status != null">#{status},</if>
+            <if test="appStatus != null">#{appStatus},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="idcard != null">#{idcard},</if>
+            <if test="cancelReason != null">#{cancelReason},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateUserAppInfo" parameterType="com.ruoyi.dental.domain.UserAppInfo">
+        update tb_user_app_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="scheduleId != null">schedule_id = #{scheduleId},</if>
+            <if test="doctorId != null">doctor_id = #{doctorId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="appStatus != null">app_status = #{appStatus},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="idcard != null">idcard = #{idcard},</if>
+            <if test="cancelReason != null">cancel_reason = #{cancelReason},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteUserAppInfoById" parameterType="Long">
+        delete from tb_user_app_info where id = #{id}
+    </delete>
+
+    <delete id="deleteUserAppInfoByIds" parameterType="String">
+        delete from tb_user_app_info where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>
