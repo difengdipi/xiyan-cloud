@@ -1,5 +1,7 @@
 package com.ruoyi.dental.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.core.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.web.domain.AjaxResult;
@@ -8,14 +10,26 @@ import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.dental.domain.DoctorSchedules;
+import com.ruoyi.dental.domain.Doctors;
+import com.ruoyi.dental.domain.vo.DoctorSchedulesVo;
 import com.ruoyi.dental.service.IDoctorSchedulesService;
+import com.ruoyi.dental.service.IDoctorsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * 医生行程Controller
@@ -26,6 +40,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/schedules")
 @Tag(name = "医生行程安排")
+@Slf4j
 public class DoctorSchedulesController extends BaseController
 {
     @Autowired
@@ -37,15 +52,12 @@ public class DoctorSchedulesController extends BaseController
     @RequiresPermissions("dental:schedules:list")
     @GetMapping("/list")
     @Operation(summary = "医生行程列表")
-    public TableDataInfo list(DoctorSchedules doctorSchedules)
+    public TableDataInfo list(DoctorSchedulesVo DoctorSchedulesVo)
     {
         startPage();
-        List<DoctorSchedules> list = doctorSchedulesService.selectDoctorSchedulesList(doctorSchedules);
+        List<DoctorSchedulesVo> list = doctorSchedulesService.selectDoctorSchedulesList(DoctorSchedulesVo);
         return getDataTable(list);
     }
-
-
-
 
     /**
      * 导出医生行程列表
@@ -54,11 +66,97 @@ public class DoctorSchedulesController extends BaseController
     @Log(title = "医生行程", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @Operation(summary = "导出医生行程列表")
-    public void export(HttpServletResponse response, DoctorSchedules doctorSchedules)
+    public void export(HttpServletResponse response, DoctorSchedulesVo doctorSchedules)
     {
-        List<DoctorSchedules> list = doctorSchedulesService.selectDoctorSchedulesList(doctorSchedules);
-        ExcelUtil<DoctorSchedules> util = new ExcelUtil<DoctorSchedules>(DoctorSchedules.class);
+        List<DoctorSchedulesVo> list = doctorSchedulesService.selectDoctorSchedulesList(doctorSchedules);
+        ExcelUtil<DoctorSchedulesVo> util = new ExcelUtil<DoctorSchedulesVo>(DoctorSchedulesVo.class);
         util.exportExcel(response, list, "医生行程数据");
+    }
+    @Autowired
+    private IDoctorsService doctorService;
+    /**
+     * 导入医生行程
+     * @param file
+     * @return
+     */
+    @SneakyThrows
+    @PostMapping("/import")
+    @RequiresPermissions("dental:schedules:import")
+    @Log(title = "医生行程", businessType = BusinessType.IMPORT)
+    @Operation(summary = "导入医生行程")
+    public AjaxResult importExcel(@RequestPart("file") MultipartFile file){
+        ExcelUtil<DoctorSchedulesVo> ExcelUtil = new ExcelUtil<>(DoctorSchedulesVo.class);
+        List<DoctorSchedulesVo> doctorSchedulesVos = ExcelUtil.importExcel(file.getInputStream());
+        //批量导入数据
+        //构造出对应的DoctorSchedules对象
+        //根据userId查询出对应的doctors中的信息
+        CompletableFuture.runAsync(()->{
+                Set<Long> collect = doctorSchedulesVos.stream().map(DoctorSchedulesVo::getUserId).collect(Collectors.toSet());
+                //根据id获取出对应的医生信息
+                List<Doctors> list = doctorService.list(new LambdaQueryWrapper<Doctors>()
+                        .in(Doctors::getUserId, collect)
+                );
+                Map<Long, Doctors> map = list.stream().collect(Collectors.toMap(Doctors::getUserId, doctors -> doctors));
+                List<DoctorSchedulesVo> doctorSchedulesVoslist = doctorSchedulesVos.stream().map(s -> {
+                    Doctors doctors = map.get(s.getUserId());
+                    s.setDoctorName(doctors.getName());
+                    s.setDoctorId(doctors.getId());
+                    s.setCreateTime(LocalDateTime.now());
+                    return s;
+                }).collect(Collectors.toList());
+                    ArrayList< DoctorSchedules> objects = new ArrayList<>();
+
+                    doctorSchedulesVoslist.stream().forEach(doctorSchedulesVo -> {
+                        DoctorSchedules build = DoctorSchedules.builder()
+                                .doctorId(doctorSchedulesVo.getDoctorId())
+                                .date(doctorSchedulesVo.getDate())
+                                .status(doctorSchedulesVo.getStatus())
+                                .createTime(doctorSchedulesVo.getCreateTime())
+                                .build();
+                        LambdaQueryWrapper<DoctorSchedules> eq = new LambdaQueryWrapper<DoctorSchedules>()
+                                .eq(DoctorSchedules::getDoctorId, build.getDoctorId())
+                                .eq(DoctorSchedules::getDate, build.getDate());
+                        DoctorSchedules one = doctorSchedulesService.getOne(eq);
+                        if( one != null){
+                            if(one.getStatus() != build.getStatus()){
+                                //更新数据--只更新状态
+                                doctorSchedulesService.update(
+                                        new LambdaUpdateWrapper<DoctorSchedules>()
+                                                .eq(DoctorSchedules::getDoctorId, one.getDoctorId())
+                                                .eq(DoctorSchedules::getDate, one.getDate())
+                                                .eq(DoctorSchedules::getAppNum,0)
+                                                .set(DoctorSchedules::getUpdateTime,LocalDateTime.now())
+                                                .set(DoctorSchedules::getStatus, build.getStatus())
+                                );
+                            }else{
+                                //这一行有重复数据
+                                return;
+                            }
+                        }else{
+                            objects.add(build);
+                        }
+                    });
+                    doctorSchedulesService.saveBatch(objects);
+                })
+        .whenCompleteAsync((s,e)->{
+            if(e!=null){
+                log.error("导入医生行程失败",e);
+            }
+            if(s!=null){
+            }
+        });
+
+
+        return success();
+    }
+    @PostMapping("/template")
+    @RequiresPermissions("dental:schedules:export")
+    @Operation(summary = "导出行程模版")
+    public void exportTemplate(HttpServletResponse response){
+        List<DoctorSchedulesVo> list = new ArrayList<>();
+        list.add(new DoctorSchedulesVo());
+        ExcelUtil<DoctorSchedulesVo> util = new ExcelUtil<DoctorSchedulesVo>(DoctorSchedulesVo.class);
+        util.exportExcel(response, list, "医生行程模版");
     }
 
     /**
@@ -93,7 +191,7 @@ public class DoctorSchedulesController extends BaseController
     @PutMapping
     @Operation(summary = "修改医生行程")
 
-    public AjaxResult edit(@RequestBody DoctorSchedules doctorSchedules)
+    public AjaxResult edit(@RequestBody DoctorSchedulesVo doctorSchedules)
     {
         return toAjax(doctorSchedulesService.updateDoctorSchedules(doctorSchedules));
     }

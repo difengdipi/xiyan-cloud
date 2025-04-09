@@ -47,6 +47,7 @@ public class DoctorsController extends BaseController
      */
     @RequiresPermissions("dental:doctors:list")
     @GetMapping("/list")
+    @Operation(summary = "查询医生信息列表")
     public TableDataInfo list(Doctors doctors)
     {
         startPage();
@@ -59,6 +60,7 @@ public class DoctorsController extends BaseController
      */
     @RequiresPermissions("dental:doctors:export")
     @Log(title = "医生信息", businessType = BusinessType.EXPORT)
+    @Operation(summary = "导出医生信息列表")
     @PostMapping("/export")
     public void export(HttpServletResponse response, Doctors doctors)
     {
@@ -71,6 +73,7 @@ public class DoctorsController extends BaseController
      * 获取医生信息详细信息
      */
     @RequiresPermissions("dental:doctors:query")
+    @Operation(summary = "获取医生信息详细信息")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -82,13 +85,12 @@ public class DoctorsController extends BaseController
      */
     @RequiresPermissions("dental:doctors:add")
     @Log(title = "医生信息", businessType = BusinessType.INSERT)
+    @Operation(summary = "新增医生信息")
     @PostMapping
     public AjaxResult add(@RequestBody Doctors doctors)
     {
         return toAjax(doctorsService.insertDoctors(doctors));
     }
-
-
 
     /**
      * 修改医生信息
@@ -96,6 +98,7 @@ public class DoctorsController extends BaseController
     @RequiresPermissions("dental:doctors:edit")
     @Log(title = "医生信息", businessType = BusinessType.UPDATE)
     @PutMapping
+    @Operation(summary = "修改医生信息")
     public AjaxResult edit(@RequestBody Doctors doctors)
     {
         return toAjax(doctorsService.updateDoctors(doctors));
@@ -104,6 +107,7 @@ public class DoctorsController extends BaseController
     /**
      * 删除医生信息
      */
+    @Operation(summary = "删除医生信息")
     @RequiresPermissions("dental:doctors:remove")
     @Log(title = "医生信息", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")

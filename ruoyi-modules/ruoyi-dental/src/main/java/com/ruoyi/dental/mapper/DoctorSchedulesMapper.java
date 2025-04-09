@@ -2,6 +2,7 @@ package com.ruoyi.dental.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.dental.domain.DoctorSchedules;
+import com.ruoyi.dental.domain.vo.DoctorSchedulesVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public interface DoctorSchedulesMapper extends BaseMapper<DoctorSchedules> {
          * @param id 医生行程主键
          * @return 医生行程
          */
-        public DoctorSchedules selectDoctorSchedulesById(Long id);
+        public DoctorSchedulesVo selectDoctorSchedulesById(Long id);
 
         /**
          * 查询医生行程列表
@@ -30,7 +31,7 @@ public interface DoctorSchedulesMapper extends BaseMapper<DoctorSchedules> {
          * @param doctorSchedules 医生行程
          * @return 医生行程集合
          */
-        public List<DoctorSchedules> selectDoctorSchedulesList(DoctorSchedules doctorSchedules);
+        public List<DoctorSchedulesVo> selectDoctorSchedulesList(DoctorSchedulesVo doctorSchedules);
 
         /**
          * 新增医生行程
@@ -46,7 +47,7 @@ public interface DoctorSchedulesMapper extends BaseMapper<DoctorSchedules> {
          * @param doctorSchedules 医生行程
          * @return 结果
          */
-        public int updateDoctorSchedules(DoctorSchedules doctorSchedules);
+        public int updateDoctorSchedules(DoctorSchedulesVo doctorSchedules);
 
         /**
          * 删除医生行程

@@ -2,6 +2,7 @@ package com.ruoyi.dental.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.dental.domain.DoctorSchedules;
+import com.ruoyi.dental.domain.vo.DoctorSchedulesVo;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface IDoctorSchedulesService  extends IService<DoctorSchedules>
      * @param id 医生行程主键
      * @return 医生行程
      */
-    public DoctorSchedules selectDoctorSchedulesById(Long id);
+    public DoctorSchedulesVo selectDoctorSchedulesById(Long id);
 
     /**
      * 查询医生行程列表
@@ -27,7 +28,7 @@ public interface IDoctorSchedulesService  extends IService<DoctorSchedules>
      * @param doctorSchedules 医生行程
      * @return 医生行程集合
      */
-    public List<DoctorSchedules> selectDoctorSchedulesList(DoctorSchedules doctorSchedules);
+    public List<DoctorSchedulesVo> selectDoctorSchedulesList(DoctorSchedulesVo doctorSchedules);
 
     /**
      * 新增医生行程
@@ -43,7 +44,7 @@ public interface IDoctorSchedulesService  extends IService<DoctorSchedules>
      * @param doctorSchedules 医生行程
      * @return 结果
      */
-    public int updateDoctorSchedules(DoctorSchedules doctorSchedules);
+    public int updateDoctorSchedules(DoctorSchedulesVo doctorSchedules);
 
     /**
      * 批量删除医生行程

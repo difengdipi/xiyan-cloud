@@ -2,6 +2,7 @@ package com.ruoyi.dental.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.dental.domain.DoctorSchedules;
+import com.ruoyi.dental.domain.vo.DoctorSchedulesVo;
 import com.ruoyi.dental.mapper.DoctorSchedulesMapper;
 import com.ruoyi.dental.service.IDoctorSchedulesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class DoctorSchedulesServiceImpl extends ServiceImpl<DoctorSchedulesMappe
      * @return 医生行程
      */
     @Override
-    public DoctorSchedules selectDoctorSchedulesById(Long id)
+    public DoctorSchedulesVo selectDoctorSchedulesById(Long id)
     {
         return doctorSchedulesMapper.selectDoctorSchedulesById(id);
     }
@@ -41,7 +42,7 @@ public class DoctorSchedulesServiceImpl extends ServiceImpl<DoctorSchedulesMappe
      * @return 医生行程
      */
     @Override
-    public List<DoctorSchedules> selectDoctorSchedulesList(DoctorSchedules doctorSchedules)
+    public List<DoctorSchedulesVo> selectDoctorSchedulesList(DoctorSchedulesVo doctorSchedules)
     {
         return doctorSchedulesMapper.selectDoctorSchedulesList(doctorSchedules);
     }
@@ -66,7 +67,7 @@ public class DoctorSchedulesServiceImpl extends ServiceImpl<DoctorSchedulesMappe
      * @return 结果
      */
     @Override
-    public int updateDoctorSchedules(DoctorSchedules doctorSchedules)
+    public int updateDoctorSchedules(DoctorSchedulesVo doctorSchedules)
     {
         doctorSchedules.setUpdateTime(LocalDateTime.now());
         return doctorSchedulesMapper.updateDoctorSchedules(doctorSchedules);

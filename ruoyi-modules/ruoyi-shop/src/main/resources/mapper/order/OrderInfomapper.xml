@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.shop.mapper.order.OrderInfoMapper">
+
+    <resultMap type="com.ruoyi.shop.domain.order.OrderInfo" id="OrderInfoResult">
+        <result property="id"    column="id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="orderState"    column="order_state"    />
+        <result property="countdown"    column="countdown"    />
+        <result property="skusId"    column="skus_id"    />
+        <result property="cancelReason"    column="cancel_reason"    />
+        <result property="trackingNumber"    column="tracking_number"    />
+        <result property="receiverContact"    column="receiver_contact"    />
+        <result property="receiverMobile"    column="receiver_mobile"    />
+        <result property="receiverAddress"    column="receiver_address"    />
+        <result property="totalMoney"    column="total_money"    />
+        <result property="postFee"    column="post_fee"    />
+        <result property="payMoney"    column="pay_money"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectOrderInfoVo">
+        select id, order_id, order_state, countdown, skus_id, cancel_reason, tracking_number, receiver_contact, receiver_mobile, receiver_address, total_money, post_fee, pay_money, create_time, update_time from sys_order_info
+    </sql>
+
+    <select id="selectOrderInfoList" parameterType="com.ruoyi.shop.domain.order.OrderInfo" resultMap="OrderInfoResult">
+        <include refid="selectOrderInfoVo"/>
+        <where>
+            <if test="orderState != null "> and order_state = #{orderState}</if>
+            <if test="skusId != null  and skusId != ''"> and skus_id = #{skusId}</if>
+            <if test="trackingNumber != null  and trackingNumber != ''"> and tracking_number = #{trackingNumber}</if>
+            <if test="receiverContact != null  and receiverContact != ''"> and receiver_contact = #{receiverContact}</if>
+            <if test="receiverMobile != null  and receiverMobile != ''"> and receiver_mobile = #{receiverMobile}</if>
+            <if test="receiverAddress != null  and receiverAddress != ''"> and receiver_address = #{receiverAddress}</if>
+            <if test="totalMoney != null "> and total_money = #{totalMoney}</if>
+            <if test="postFee != null "> and post_fee = #{postFee}</if>
+            <if test="payMoney != null "> and pay_money = #{payMoney}</if>
+        </where>
+    </select>
+
+    <select id="selectOrderInfoById" parameterType="Long" resultMap="OrderInfoResult">
+        <include refid="selectOrderInfoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertOrderInfo" parameterType="com.ruoyi.shop.domain.order.OrderInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_order_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">order_id,</if>
+            <if test="orderState != null">order_state,</if>
+            <if test="countdown != null">countdown,</if>
+            <if test="skusId != null and skusId != ''">skus_id,</if>
+            <if test="cancelReason != null">cancel_reason,</if>
+            <if test="trackingNumber != null">tracking_number,</if>
+            <if test="receiverContact != null and receiverContact != ''">receiver_contact,</if>
+            <if test="receiverMobile != null and receiverMobile != ''">receiver_mobile,</if>
+            <if test="receiverAddress != null and receiverAddress != ''">receiver_address,</if>
+            <if test="totalMoney != null">total_money,</if>
+            <if test="postFee != null">post_fee,</if>
+            <if test="payMoney != null">pay_money,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">#{orderId},</if>
+            <if test="orderState != null">#{orderState},</if>
+            <if test="countdown != null">#{countdown},</if>
+            <if test="skusId != null and skusId != ''">#{skusId},</if>
+            <if test="cancelReason != null">#{cancelReason},</if>
+            <if test="trackingNumber != null">#{trackingNumber},</if>
+            <if test="receiverContact != null and receiverContact != ''">#{receiverContact},</if>
+            <if test="receiverMobile != null and receiverMobile != ''">#{receiverMobile},</if>
+            <if test="receiverAddress != null and receiverAddress != ''">#{receiverAddress},</if>
+            <if test="totalMoney != null">#{totalMoney},</if>
+            <if test="postFee != null">#{postFee},</if>
+            <if test="payMoney != null">#{payMoney},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateOrderInfo" parameterType="com.ruoyi.shop.domain.order.OrderInfo">
+        update sys_order_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="orderState != null">order_state = #{orderState},</if>
+            <if test="countdown != null">countdown = #{countdown},</if>
+            <if test="skusId != null and skusId != ''">skus_id = #{skusId},</if>
+            <if test="cancelReason != null">cancel_reason = #{cancelReason},</if>
+            <if test="trackingNumber != null">tracking_number = #{trackingNumber},</if>
+            <if test="receiverContact != null and receiverContact != ''">receiver_contact = #{receiverContact},</if>
+            <if test="receiverMobile != null and receiverMobile != ''">receiver_mobile = #{receiverMobile},</if>
+            <if test="receiverAddress != null and receiverAddress != ''">receiver_address = #{receiverAddress},</if>
+            <if test="totalMoney != null">total_money = #{totalMoney},</if>
+            <if test="postFee != null">post_fee = #{postFee},</if>
+            <if test="payMoney != null">pay_money = #{payMoney},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOrderInfoById" parameterType="Long">
+        delete from sys_order_info where id = #{id}
+    </delete>
+
+    <delete id="deleteOrderInfoByIds" parameterType="String">
+        delete from sys_order_info where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

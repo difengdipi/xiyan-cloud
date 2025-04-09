@@ -3,7 +3,7 @@ package com.ruoyi.dental.domain.vo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 /**
  * @Description:
@@ -47,6 +47,6 @@ public class AppDetailVo {
 
     // 预约时间
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
+    private Date date;
 }
 
