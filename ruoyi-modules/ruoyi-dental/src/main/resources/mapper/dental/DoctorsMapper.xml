@@ -31,7 +31,7 @@
             <if test="title != null  and title != ''"> and title = #{title}</if>
             <if test="hospital != null  and hospital != ''"> and hospital = #{hospital}</if>
             <if test="specialty != null  and specialty != ''"> and specialty = #{specialty}</if>
-            <if test="appNum != null "> and app_num = #{appNum}</if>
+            <if test="appNum != null and appNum != 0"> and app_num = #{appNum}</if>
         </where>
     </select>
 

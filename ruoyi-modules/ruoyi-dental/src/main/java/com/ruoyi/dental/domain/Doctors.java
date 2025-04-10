@@ -53,7 +53,7 @@ public class Doctors
 
     /** 总预约数量 */
     @Excel(name = "总预约数量")
-    private Long appNum;
+    private Long appNum = 0L;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
