@@ -29,7 +29,7 @@ public class DoctorsSchedule {
     @Autowired
     private IDoctorsService doctorsService;
 
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "0/60 * * * * ?")
     public void countDoctorAppNum(){
         List<Doctors> list = doctorsService.list();
         for (Doctors doctors : list){

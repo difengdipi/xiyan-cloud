@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.vo.AppDetailVo;
 import com.ruoyi.dental.domain.vo.AppNumVo;
+import com.ruoyi.dental.domain.vo.UserAppInfoDto;
 import com.ruoyi.dental.mapper.UserAppInfoMapper;
 import com.ruoyi.dental.service.IUserAppInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class UserAppInfoServiceImpl extends ServiceImpl<UserAppInfoMapper, UserA
      * @return 预约
      */
     @Override
-    public List<UserAppInfo> selectUserAppInfoList(UserAppInfo userAppInfo)
+    public List<UserAppInfoDto> selectUserAppInfoList(UserAppInfoDto userAppInfo)
     {
         return userAppInfoMapper.selectUserAppInfoList(userAppInfo);
     }

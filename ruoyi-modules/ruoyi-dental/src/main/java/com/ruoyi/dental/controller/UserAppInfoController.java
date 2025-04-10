@@ -16,6 +16,7 @@ import com.ruoyi.dental.domain.Patients;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.vo.AppDetailReasonDto;
 import com.ruoyi.dental.domain.vo.AppDetailVo;
+import com.ruoyi.dental.domain.vo.UserAppInfoDto;
 import com.ruoyi.dental.service.IDoctorSchedulesService;
 import com.ruoyi.dental.service.IPatientsService;
 import com.ruoyi.dental.service.IUserAppInfoService;
@@ -190,10 +191,10 @@ public class UserAppInfoController extends BaseController {
      */
     @RequiresPermissions("dental:UserAppInfo:list")
     @GetMapping("/admin/list")
-    public TableDataInfo list(UserAppInfo userAppInfo)
+    public TableDataInfo list(UserAppInfoDto userAppInfo)
     {
         startPage();
-        List<UserAppInfo> list = userAppInfoService.selectUserAppInfoList(userAppInfo);
+        List<UserAppInfoDto> list = userAppInfoService.selectUserAppInfoList(userAppInfo);
         return getDataTable(list);
     }
 
@@ -203,10 +204,10 @@ public class UserAppInfoController extends BaseController {
     @RequiresPermissions("dental:UserAppInfo:export")
     @Log(title = "预约", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, UserAppInfo userAppInfo)
+    public void export(HttpServletResponse response, UserAppInfoDto userAppInfo)
     {
-        List<UserAppInfo> list = userAppInfoService.selectUserAppInfoList(userAppInfo);
-        ExcelUtil<UserAppInfo> util = new ExcelUtil<UserAppInfo>(UserAppInfo.class);
+        List<UserAppInfoDto> list = userAppInfoService.selectUserAppInfoList(userAppInfo);
+        ExcelUtil<UserAppInfoDto> util = new ExcelUtil<UserAppInfoDto>(UserAppInfoDto.class);
         util.exportExcel(response, list, "预约数据");
     }
 

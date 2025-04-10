@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.vo.AppDetailVo;
 import com.ruoyi.dental.domain.vo.AppNumVo;
+import com.ruoyi.dental.domain.vo.UserAppInfoDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public interface UserAppInfoMapper extends BaseMapper<UserAppInfo> {
      * @param userAppInfo 预约
      * @return 预约集合
      */
-    public List<UserAppInfo> selectUserAppInfoList(UserAppInfo userAppInfo);
+    public List<UserAppInfoDto> selectUserAppInfoList(UserAppInfoDto userAppInfo);
 
     /**
      * 新增预约

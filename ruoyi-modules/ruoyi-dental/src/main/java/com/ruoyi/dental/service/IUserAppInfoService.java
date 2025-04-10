@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.vo.AppDetailVo;
 import com.ruoyi.dental.domain.vo.AppNumVo;
+import com.ruoyi.dental.domain.vo.UserAppInfoDto;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public interface IUserAppInfoService extends IService<UserAppInfo> {
      * @param userAppInfo 预约
      * @return 预约集合
      */
-    public List<UserAppInfo> selectUserAppInfoList(UserAppInfo userAppInfo);
+    public List<UserAppInfoDto> selectUserAppInfoList(UserAppInfoDto userAppInfo);
 
     /**
      * 新增预约
