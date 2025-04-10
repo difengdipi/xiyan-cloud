@@ -131,7 +131,9 @@ public class DoctorsController extends BaseController
     @Operation(summary = "获取今日在线医生")
     @GetMapping("/infos")
     public R getDockersInfo(){
-        List<Doctors> list = doctorsService.list();
+        List<Doctors> list = doctorsService.list(new LambdaQueryWrapper<Doctors>()
+                .eq(Doctors::getStatus,1)
+        );
         return  R.ok(list);
     }
 

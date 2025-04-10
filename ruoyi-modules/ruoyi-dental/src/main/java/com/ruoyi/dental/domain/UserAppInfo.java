@@ -1,5 +1,6 @@
 package com.ruoyi.dental.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserAppInfo {
     private Long id; // 使用Long类型以匹配数据库中的bigint(20)
     private Long userId; // 使用Integer匹配int(11)

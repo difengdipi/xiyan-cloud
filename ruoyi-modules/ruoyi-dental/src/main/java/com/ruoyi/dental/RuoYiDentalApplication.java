@@ -14,6 +14,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 牙医诊所模块
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 @EnableRyFeignClients
 @SpringBootApplication
 @MapperScan("com.ruoyi.dental.mapper")
+@EnableScheduling
 public class RuoYiDentalApplication
 {
     public static void main(String[] args)

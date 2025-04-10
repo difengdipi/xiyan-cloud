@@ -77,12 +77,13 @@ public class UserAppInfoController extends BaseController {
         Long userid = DentalUtils.getUserId();
         appUserInfo.setUserId(userid);
         appUserInfo.setCreateTime(new Date());
+        appUserInfo.setStatus((short)0);
         log.info("添加用户病例预约信息:{}",appUserInfo);
         userAppInfoService.save(appUserInfo);
         CompletableFuture.runAsync(()-> {
             doctorSchedulesService.update(new LambdaUpdateWrapper<DoctorSchedules>()
                     .eq(DoctorSchedules::getId, appUserInfo.getScheduleId())
-                    .setSql("app_num = app_num + 1") // ✅ 原子性 +1
+                    .set(DoctorSchedules::getAppNum, doctorSchedulesService.getById(appUserInfo.getScheduleId()).getAppNum()+1)
             );
             //同时创建患者--需要判断患者是否存在
             if(appUserInfo.getPhone() != null){
@@ -92,15 +93,16 @@ public class UserAppInfoController extends BaseController {
                 if(one != null){
                     return ;
                 }
-            }else{
-                Patients build = Patients.builder()
-                        .userName(appUserInfo.getName())
-                        .age(SensiUtils.getAge(appUserInfo.getIdcard()))
-                        .gender(SensiUtils.getSec(appUserInfo.getIdcard()))
-                        .phoneNumber(appUserInfo.getPhone().toString())
-                        .createdTime(new Date())
-                        .build();
-                patientsService.save(build);
+                else{
+                    Patients build = Patients.builder()
+                            .userName(appUserInfo.getName())
+                            .age(SensiUtils.getAge(appUserInfo.getIdcard()))
+                            .gender(SensiUtils.getSec(appUserInfo.getIdcard()))
+                            .phoneNumber(appUserInfo.getPhone().toString())
+                            .createdTime(new Date())
+                            .build();
+                    patientsService.save(build);
+                }
             }
         }).whenCompleteAsync((v,e)->{
             if (e != null) {
