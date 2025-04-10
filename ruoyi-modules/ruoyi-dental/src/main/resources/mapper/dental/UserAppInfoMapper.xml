@@ -47,7 +47,7 @@
              </if>
          </where>
         ORDER BY
-            tb_user_app_info.update_time DESC
+            tb_user_app_info.create_time DESC
     </select>
 
 

@@ -76,6 +76,7 @@ public class UserAppInfoController extends BaseController {
         //TODO:需要做一个校验  同一用户预约同一天并且预约信息为同一个人时，提醒用户今日有预约了
         Long userid = DentalUtils.getUserId();
         appUserInfo.setUserId(userid);
+        appUserInfo.setCreateTime(new Date());
         log.info("添加用户病例预约信息:{}",appUserInfo);
         userAppInfoService.save(appUserInfo);
         CompletableFuture.runAsync(()-> {
@@ -177,7 +178,6 @@ public class UserAppInfoController extends BaseController {
                 map.put(list.get(i).getIdcard(),1);
             }
         }
-        log.info("查询用户所创建的全部患者信息：{}",list);
         return R.ok(list);
     }
 

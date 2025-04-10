@@ -1,5 +1,6 @@
 package com.ruoyi.system.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ruoyi.common.core.annotation.Excel;
 import com.ruoyi.common.core.annotation.Excel.ColumnType;
 import com.ruoyi.common.core.annotation.Excel.Type;
@@ -21,6 +22,7 @@ import java.util.List;
  * 
  * @author ruoyi
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SysUser extends BaseEntity
 {
     private static final long serialVersionUID = 1L;

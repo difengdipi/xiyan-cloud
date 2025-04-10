@@ -9,8 +9,8 @@ import com.ruoyi.dental.service.IDoctorsService;
 import com.ruoyi.system.api.domain.SysUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -112,14 +112,17 @@ public class DoctorsServiceImpl extends ServiceImpl<DoctorsMapper,Doctors> imple
         if(StringUtils.isEmpty(sysUser.getUserName())){
             return R.fail("用户名为空");
         }
+        System.out.println("sysUser::::"+sysUser);
         Set<Long> collect = Arrays.stream(sysUser.getRoleIds()).filter(roleId -> roleId == 4).collect(Collectors.toSet());
         //角色确定权限------如果是医生角色就创建否则就不创建-并给出提示就ok
-        if(ObjectUtils.isEmpty(collect) || collect.size() == 0){
+        if(collect.isEmpty()){
             return R.fail("不是医生角色，无法创建医生信息");
         }
         Doctors doctors = new Doctors();
         doctors.setUserId(sysUser.getUserId());
-        doctors.setName(sysUser.getUserName());
+        doctors.setName(sysUser.getNickName());
+        doctors.setStatus(0L);
+        doctors.setCreateTime(LocalDateTime.now());
         return doctorsMapper.insert(doctors) > 1 ? R.ok() : R.fail("创建医生信息失败");
     }
 }
