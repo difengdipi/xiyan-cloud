@@ -1,0 +1,158 @@
+package com.ruoyi.shop.controller.order;
+
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ruoyi.common.core.utils.poi.ExcelUtil;
+import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.core.web.domain.AjaxResult;
+import com.ruoyi.common.core.web.page.TableDataInfo;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.security.annotation.RequiresPermissions;
+import com.ruoyi.shop.domain.order.OrderInfo;
+import com.ruoyi.shop.service.order.OrderInfoIService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 订单管理Controller
+ * 
+ * @author zh
+ * @date 2025-04-09
+ */
+@RestController
+@RequestMapping("/info")
+@Slf4j
+@Tag(name = "订单管理")
+public class OrderInfoController extends BaseController
+{
+    @Autowired
+    private OrderInfoIService orderInfoService;
+
+    /**
+     * 查询订单管理列表
+     */
+    @RequiresPermissions("shop:info:list")
+    @GetMapping("/list")
+    @Operation(summary = "查询订单管理列表")
+    public TableDataInfo list(OrderInfo orderInfo)
+    {
+        startPage();
+        List<OrderInfo> list = orderInfoService.selectOrderInfoList(orderInfo);
+        return getDataTable(list);
+    }
+
+    /**
+     * 导出订单管理列表
+     */
+    @RequiresPermissions("shop:info:export")
+    @Log(title = "订单管理", businessType = BusinessType.EXPORT)
+    @Operation(summary = "导出订单管理列表")
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, OrderInfo orderInfo)
+    {
+        List<OrderInfo> list = orderInfoService.selectOrderInfoList(orderInfo);
+        ExcelUtil<OrderInfo> util = new ExcelUtil<OrderInfo>(OrderInfo.class);
+        util.exportExcel(response, list, "订单管理数据");
+    }
+
+    /**
+     * 获取订单管理详细信息
+     */
+    @RequiresPermissions("shop:info:query")
+    @GetMapping(value = "/{id}")
+    @Operation(summary = "获取订单管理详细信息")
+    public AjaxResult getInfo(@PathVariable("id") Long id)
+    {
+        return success(orderInfoService.selectOrderInfoById(id));
+    }
+
+    /**
+     * 新增订单管理
+     */
+    @RequiresPermissions("shop:info:add")
+    @Log(title = "订单管理", businessType = BusinessType.INSERT)
+    @Operation(summary = "新增订单管理")
+    @PostMapping
+    public AjaxResult add(@RequestBody OrderInfo orderInfo)
+    {
+        return toAjax(orderInfoService.insertOrderInfo(orderInfo));
+    }
+
+    /**
+     * 修改订单管理
+     */
+    @RequiresPermissions("shop:info:edit")
+    @Log(title = "订单管理", businessType = BusinessType.UPDATE)
+    @Operation(summary = "修改订单管理")
+    @PutMapping
+    public AjaxResult edit(@RequestBody OrderInfo orderInfo)
+    {
+        return toAjax(orderInfoService.updateOrderInfo(orderInfo));
+    }
+
+    /**
+     * 删除订单管理
+     */
+    @RequiresPermissions("shop:info:remove")
+    @Log(title = "订单管理", businessType = BusinessType.DELETE)
+    @Operation(summary = "删除订单管理")
+	@DeleteMapping("/{ids}")
+    public AjaxResult remove(@PathVariable Long[] ids)
+    {
+        return toAjax(orderInfoService.deleteOrderInfoByIds(ids));
+    }
+
+
+    @RequiresPermissions("shop:info:import")
+    @Log(title = "导出模版", businessType = BusinessType.EXPORT)
+    @Operation(summary = "导出模版")
+    @PostMapping("/template")
+    public void template(HttpServletResponse response){
+        List<OrderInfo> list = new ArrayList<>();
+        list.add(new OrderInfo());
+        ExcelUtil<OrderInfo> util = new ExcelUtil<OrderInfo>(OrderInfo.class);
+        util.exportExcel(response, list, "订单信息模版");
+    }
+
+    /**
+     * 导入订单信息包含更新
+     * @param file
+     * @return
+     */
+    @SneakyThrows
+    @PostMapping("/import")
+    @RequiresPermissions("shop:info:import")
+    @Log(title = "医生行程", businessType = BusinessType.IMPORT)
+    @Operation(summary = "导入订单信息")
+    public AjaxResult importExcel(@RequestPart("file") MultipartFile file){
+        ExcelUtil<OrderInfo> ExcelUtil = new ExcelUtil<>(OrderInfo.class);
+        List<OrderInfo> collect = ExcelUtil.importExcel(file.getInputStream());
+        log.info("orderInfoList:{}",collect);
+        //批量导入数据
+        for (OrderInfo orderInfo : collect) {
+            LambdaUpdateWrapper<OrderInfo> orderInfoLambdaUpdateWrapper =
+                    new LambdaUpdateWrapper<OrderInfo>()
+                            .eq(OrderInfo::getOrderId,orderInfo.getOrderId())
+                            .set(OrderInfo::getOrderState,orderInfo.getOrderState())
+                            .set(OrderInfo::getUpdateTime,orderInfo.getUpdateTime());
+            if(orderInfo.getOrderState() == 6){
+                orderInfoLambdaUpdateWrapper
+                        .set(OrderInfo::getCancelReason,orderInfo.getCancelReason());
+            }
+            if(orderInfo.getOrderState() == 3){
+                orderInfoLambdaUpdateWrapper.set(OrderInfo::getTrackingNumber,orderInfo.getTrackingNumber());
+            }
+            orderInfoService.update(orderInfoLambdaUpdateWrapper);
+        }
+        return  success();
+    }
+}
