@@ -28,7 +28,7 @@ public class Doctors
     private String name;
 
     /** 医生状态（0  请假 1 营业中 2 下班） */
-    @Excel(name = "医生状态", readConverterExp = "0=,请=假,1=,营=业中,2=,下=班")
+    @Excel(name = "医生状态", readConverterExp = "0=请假,1=营业中,2=下班")
     private Long status;
 
     /** 头像 */
@@ -54,7 +54,6 @@ public class Doctors
     /** 总预约数量 */
     @Excel(name = "总预约数量")
     private Long appNum;
-
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 

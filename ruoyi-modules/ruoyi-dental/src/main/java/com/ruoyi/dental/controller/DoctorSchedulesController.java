@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -177,10 +178,11 @@ public class DoctorSchedulesController extends BaseController
     @Log(title = "医生行程", businessType = BusinessType.INSERT)
     @PostMapping
     @Operation(summary = "新增医生行程")
-
-    public AjaxResult add(@RequestBody DoctorSchedules doctorSchedules)
+    public AjaxResult add(@RequestBody DoctorSchedulesVo doctorSchedules)
     {
-        return toAjax(doctorSchedulesService.save(doctorSchedules));
+        DoctorSchedules doctorSchedules1 = new DoctorSchedules();
+        BeanUtils.copyProperties(doctorSchedules, doctorSchedules1);
+        return toAjax(doctorSchedulesService.save(doctorSchedules1));
     }
 
     /**
