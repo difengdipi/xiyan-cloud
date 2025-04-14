@@ -43,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and doc.name like concat('%', #{doctorName}, '%')
             </if>
             <if test="date != null"> and date = #{date}</if>
-            <if test="status != null"> and status = #{status}</if>
+            <if test="status != null"> and sc.status = #{status}</if>
             <if test="appNum != null"> and app_num = #{appNum}</if>
         </where>
         order by

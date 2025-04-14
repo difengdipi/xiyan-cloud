@@ -9,6 +9,7 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.dental.domain.Appointments;
 import com.ruoyi.dental.service.IAppointmentsService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/appointments")
+@Tag(name = " 挂号建档")
 public class AppointmentsController extends BaseController
 {
     @Autowired
