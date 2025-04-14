@@ -192,4 +192,25 @@ public class GoodsController {
             return R.fail("修改商品失败");
         }
     }
+
+    /**
+     * 根据商品名模糊查询商品
+     * @param goodsName
+     * @return
+     */
+    @GetMapping("/like")
+    @Operation(summary = "模糊查询商品")
+    public R listGoods(@RequestParam String goodsName){
+
+        return null;
+    }
+
+    /**
+     * 根据skus查询商品
+     * @return
+     */
+    @PostMapping("/getGoodsBySkus")
+    public R selectBySkus(@RequestBody Long[] ids){
+        return null;
+    }
 }

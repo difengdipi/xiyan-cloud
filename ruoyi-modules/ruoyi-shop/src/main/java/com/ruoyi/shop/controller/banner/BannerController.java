@@ -1,16 +1,19 @@
 package com.ruoyi.shop.controller.banner;
 
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.redis.service.RedisService;
 import com.ruoyi.shop.domain.Banner.Banner;
 import com.ruoyi.shop.service.banner.BannerService;
 import com.ruoyi.system.api.RemoteFileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -18,15 +21,28 @@ import java.util.Random;
 @RestController
 @RequestMapping(value = "/home/banner/")
 @Tag(name = "显示banner")
+@Slf4j
 public class BannerController {
+
+    @PostConstruct
+    public void init(){
+        log.info("Banner Controller Bean加载完成，开始初始化首页数据");
+        getAllBanner(1);
+
+    }
+    private final static String redisKey = "AllBanners";
     @Autowired
     private BannerService bannerService;
     @Autowired
     RemoteFileService remoteFileService;
-
+    @Autowired
+    RedisService redisService;
     @Operation(summary = "获得所有的banner")
     @GetMapping(value = "/getAllBanners")
     public R getAllBanner(@RequestParam(name = "distributionSite", defaultValue = "1") int distributionSite) {
+        if(redisService.hasKey(redisKey)){
+            return R.ok( redisService.getCacheObject(redisKey));
+        }
         List<Banner> banners = bannerService.list();
 
         // 商品分类轮播图
@@ -50,12 +66,14 @@ public class BannerController {
                 banners.get(i).setImgUrl(randomImages[i % randomImages.length]);
             }
         }
+        redisService.setCacheObject(redisKey, banners);
         return R.ok( banners);
     }
 
     @Operation(summary = "增加轮播图")
     @PostMapping(value = "/addBanner")
     public R addBanner(@RequestBody Banner banner) {
+        redisService.deleteObject(redisKey);
         boolean flag = bannerService.save(banner);
         if (flag) {
             return R.ok("增加轮播图成功");
@@ -79,6 +97,7 @@ public class BannerController {
     @Operation(summary = "删除轮播图数据")
     @DeleteMapping(value = "/deleteBanner/{id}")
     public R deleteBanner(@PathVariable("id") Integer bannerId) {
+        redisService.deleteObject(redisKey);
         boolean flag = bannerService.removeById(bannerId);
         if (flag) {
             return R.ok("删除轮播图成功");
@@ -97,6 +116,7 @@ public class BannerController {
     @Operation(summary = "修改轮播图数据")
     @PutMapping(value = "/updateBanner")
     public R updateBanner(@RequestBody Banner banner) {
+        redisService.deleteObject(redisKey);
         boolean flag = bannerService.updateById(banner);
         if (flag) {
             return R.ok("修改轮播图成功");
