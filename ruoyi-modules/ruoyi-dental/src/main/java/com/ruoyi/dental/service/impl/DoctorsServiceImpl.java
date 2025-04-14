@@ -112,8 +112,7 @@ public class DoctorsServiceImpl extends ServiceImpl<DoctorsMapper,Doctors> imple
         if(StringUtils.isEmpty(sysUser.getUserName())){
             return R.fail("用户名为空");
         }
-        System.out.println("sysUser::::"+sysUser);
-        Set<Long> collect = Arrays.stream(sysUser.getRoleIds()).filter(roleId -> roleId == 4).collect(Collectors.toSet());
+        Set<Long> collect = Arrays.stream(sysUser.getRoleIds()).filter(roleId -> roleId == 100).collect(Collectors.toSet());
         //角色确定权限------如果是医生角色就创建否则就不创建-并给出提示就ok
         if(collect.isEmpty()){
             return R.fail("不是医生角色，无法创建医生信息");

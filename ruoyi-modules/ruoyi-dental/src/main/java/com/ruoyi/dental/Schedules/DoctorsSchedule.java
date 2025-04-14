@@ -29,7 +29,7 @@ public class DoctorsSchedule {
     @Autowired
     private IDoctorsService doctorsService;
 
-    @Scheduled(cron = "0/60 * * * * ?")
+    @Scheduled(cron = "* 0/2 * * * ?")
     public void countDoctorAppNum(){
         List<Doctors> list = doctorsService.list();
         for (Doctors doctors : list){
@@ -37,6 +37,9 @@ public class DoctorsSchedule {
             List<DoctorSchedules> list1 = doctorSchedulesService.list(new LambdaQueryWrapper<DoctorSchedules>()
                     .eq(DoctorSchedules::getDoctorId, doctors.getId())
             );
+            if(list1.isEmpty()){
+                return ;
+            }
             Integer appNum = list1.stream().map(DoctorSchedules::getAppNum).reduce(Integer::sum).get();
             Long num =0L;
             doctorsService.update(new LambdaUpdateWrapper<Doctors>()
