@@ -7,6 +7,7 @@ import com.ruoyi.common.core.web.domain.AjaxResult;
 import com.ruoyi.common.core.web.page.TableDataInfo;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.redis.service.RedisService;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.shop.domain.order.OrderInfo;
 import com.ruoyi.shop.service.order.OrderInfoIService;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 订单管理Controller
@@ -36,7 +38,9 @@ public class OrderInfoController extends BaseController
 {
     @Autowired
     private OrderInfoIService orderInfoService;
-
+    @Autowired
+    private RedisService redisService;
+    private final String CACHE_PREFIX = "orderInfoList";
     /**
      * 查询订单管理列表
      */
@@ -47,6 +51,7 @@ public class OrderInfoController extends BaseController
     {
         startPage();
         List<OrderInfo> list = orderInfoService.selectOrderInfoList(orderInfo);
+        redisService.setCacheList(CACHE_PREFIX,list);
         return getDataTable(list);
     }
 
@@ -59,8 +64,15 @@ public class OrderInfoController extends BaseController
     @PostMapping("/export")
     public void export(HttpServletResponse response, OrderInfo orderInfo)
     {
-        List<OrderInfo> list = orderInfoService.selectOrderInfoList(orderInfo);
         ExcelUtil<OrderInfo> util = new ExcelUtil<OrderInfo>(OrderInfo.class);
+        List<OrderInfo> list = null;
+        if(redisService.hasKey(CACHE_PREFIX)){
+            list = redisService.getCacheList(CACHE_PREFIX);
+
+            util.exportExcel(response, list, "订单管理数据");
+        }else {
+            list = orderInfoService.selectOrderInfoList(orderInfo);
+        }
         util.exportExcel(response, list, "订单管理数据");
     }
 
@@ -84,6 +96,9 @@ public class OrderInfoController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody OrderInfo orderInfo)
     {
+        CompletableFuture.runAsync(() -> {
+            redisService.deleteObject(CACHE_PREFIX);
+        });
         return toAjax(orderInfoService.insertOrderInfo(orderInfo));
     }
 
@@ -96,6 +111,9 @@ public class OrderInfoController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody OrderInfo orderInfo)
     {
+        CompletableFuture.runAsync(() -> {
+            redisService.deleteObject(CACHE_PREFIX);
+        });
         return toAjax(orderInfoService.updateOrderInfo(orderInfo));
     }
 
@@ -108,6 +126,9 @@ public class OrderInfoController extends BaseController
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
+        CompletableFuture.runAsync(() -> {
+            redisService.deleteObject(CACHE_PREFIX);
+        });
         return toAjax(orderInfoService.deleteOrderInfoByIds(ids));
     }
 
@@ -138,6 +159,9 @@ public class OrderInfoController extends BaseController
         List<OrderInfo> collect = ExcelUtil.importExcel(file.getInputStream());
         log.info("orderInfoList:{}",collect);
         //批量导入数据
+        CompletableFuture.runAsync(() -> {
+            redisService.deleteObject(CACHE_PREFIX);
+        });
         for (OrderInfo orderInfo : collect) {
             LambdaUpdateWrapper<OrderInfo> orderInfoLambdaUpdateWrapper =
                     new LambdaUpdateWrapper<OrderInfo>()
