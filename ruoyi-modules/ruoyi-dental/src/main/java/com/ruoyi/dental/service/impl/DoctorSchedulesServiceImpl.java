@@ -96,4 +96,9 @@ public class DoctorSchedulesServiceImpl extends ServiceImpl<DoctorSchedulesMappe
     {
         return doctorSchedulesMapper.deleteDoctorSchedulesById(id);
     }
+
+    @Override
+    public int updateByScheduleId(Long scheduleId) {
+        return doctorSchedulesMapper.updateByScheduleId(scheduleId);
+    }
 }

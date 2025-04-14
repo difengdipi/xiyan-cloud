@@ -99,6 +99,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
+    <update id="updateByScheduleId">
+        update tb_doctor_schedules
+        SET
+            app_num = app_num + 1
+        where
+            id = #{scheduleId}
+           and max_num > app_num
+    </update>
+
     <delete id="deleteDoctorSchedulesById" parameterType="Long">
         delete from tb_doctor_schedules where id = #{id}
     </delete>
@@ -109,4 +118,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
 </mapper>

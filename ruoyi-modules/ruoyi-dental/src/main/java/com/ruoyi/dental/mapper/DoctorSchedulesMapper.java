@@ -64,4 +64,7 @@ public interface DoctorSchedulesMapper extends BaseMapper<DoctorSchedules> {
          * @return 结果
          */
         public int deleteDoctorSchedulesByIds(Long[] ids);
-    }
+
+    int updateByScheduleId(Long scheduleId);
+
+}

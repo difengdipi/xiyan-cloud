@@ -25,14 +25,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -51,6 +49,8 @@ public class UserAppInfoController extends BaseController {
     IUserAppInfoService userAppInfoService;
     @Resource
     IPatientsService patientsService;
+    @Autowired
+    IDoctorSchedulesService doctorSchedulesService;
 
     /**
      *  根据用户id查询所创建的用户的病例
@@ -65,7 +65,35 @@ public class UserAppInfoController extends BaseController {
         return R.ok(list);
     }
 
+    /**
+     * 今日是否存在重复数据
+     * @param appUserInfo
+     * @return
+     */
+    public R isExist(UserAppInfo appUserInfo){
+        Date today = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(today);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date startOfDay = calendar.getTime();
 
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        Date endOfDay = calendar.getTime();
+
+        if(userAppInfoService.list(new LambdaQueryWrapper<UserAppInfo>()
+                .eq(UserAppInfo::getIdcard, appUserInfo.getIdcard())
+                .eq(UserAppInfo::getPhone, appUserInfo.getPhone())
+                .ge(UserAppInfo::getCreateTime, startOfDay)
+                .lt(UserAppInfo::getCreateTime, endOfDay)
+        ).size() > 0) {
+            return R.fail("您今日已有预约，请勿重复预约");
+        }else{
+            return R.ok();
+        }
+    }
     /**
      *  添加用户病例预约信息
      * @param appUserInfo
@@ -73,14 +101,26 @@ public class UserAppInfoController extends BaseController {
      */
     @Operation(summary= "添加用户病例预约信息")
     @PutMapping("/add")
+    @Transactional
     public R addAppUserInfo(@RequestBody UserAppInfo appUserInfo){
-        //TODO:需要做一个校验  同一用户预约同一天并且预约信息为同一个人时，提醒用户今日有预约了
         Long userid = DentalUtils.getUserId();
         appUserInfo.setUserId(userid);
         appUserInfo.setCreateTime(new Date());
         appUserInfo.setStatus((short)0);
-        log.info("添加用户病例预约信息:{}",appUserInfo);
-        userAppInfoService.save(appUserInfo);
+        //判断该用户今日是否有预约
+        if(isExist(appUserInfo).getCode() == 500){
+            return isExist(appUserInfo);
+        }
+        // 使用数据库版本进行
+        int update = doctorSchedulesService.updateByScheduleId(appUserInfo.getScheduleId());
+        if(update <= 0){
+            //将当前的行程状态改为不可预约
+            boolean update1 = doctorSchedulesService.update(new LambdaUpdateWrapper<DoctorSchedules>()
+                    .eq(DoctorSchedules::getId, appUserInfo.getScheduleId())
+                    .set(DoctorSchedules::getStatus, 0)
+            );
+            return R.fail("预约失败,当前主治医生预约已满");
+        }
         CompletableFuture.runAsync(()-> {
             doctorSchedulesService.update(new LambdaUpdateWrapper<DoctorSchedules>()
                     .eq(DoctorSchedules::getId, appUserInfo.getScheduleId())
@@ -91,7 +131,11 @@ public class UserAppInfoController extends BaseController {
                 Patients one = patientsService.getOne(new LambdaQueryWrapper<Patients>()
                         .eq(Patients::getPhoneNumber, appUserInfo.getPhone().toString())
                 );
+                LambdaUpdateWrapper<UserAppInfo> wrapper = new LambdaUpdateWrapper<>();
                 if(one != null){
+                    appUserInfo.setPatientId(one.getPatientId());
+                    wrapper.set(UserAppInfo::getPatientId, one.getPatientId()).eq(UserAppInfo::getId, appUserInfo.getId());
+                    userAppInfoService.update(wrapper);
                     return ;
                 }
                 else{
@@ -103,6 +147,8 @@ public class UserAppInfoController extends BaseController {
                             .createdTime(new Date())
                             .build();
                     patientsService.save(build);
+                    wrapper.set(UserAppInfo::getPatientId, build.getPatientId()).eq(UserAppInfo::getId, appUserInfo.getId());
+                    userAppInfoService.update(wrapper);
                 }
             }
         }).whenCompleteAsync((v,e)->{
@@ -113,6 +159,7 @@ public class UserAppInfoController extends BaseController {
                 log.info("异步调用成功");
             }
         });
+        userAppInfoService.save(appUserInfo);
         return R.ok(appUserInfo.getId());
     }
 
@@ -134,12 +181,9 @@ public class UserAppInfoController extends BaseController {
         Long userId = DentalUtils.getUserId();
         //根据用户id查询全部的预约信息表
         List<AppDetailVo> AppDetailVolsit = userAppInfoService.AllApplist(userId);
-        log.info("查询用户的全部预约:{}",AppDetailVolsit);
         return R.ok(AppDetailVolsit);
     }
 
-    @Autowired
-    IDoctorSchedulesService doctorSchedulesService;
     @Operation(summary = "查询用户的预约详细信息")
     @GetMapping("/byId/{id}")
     public R geetUserByid(@PathVariable("id")Long id){
@@ -235,12 +279,19 @@ public class UserAppInfoController extends BaseController {
     /**
      * 删除预约
      */
-    @RequiresPermissions("dental:UserAppInfo:remove")
     @Log(title = "预约", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
+    public AjaxResult remove(@PathVariable("ids") Long[] ids)
     {
-        return toAjax(userAppInfoService.deleteUserAppInfoByIds(ids));
+        Long userId = DentalUtils.getUserId();
+        //TODO：用户端的删除只是删除了他所对应的用户的预约信息，但是数据库中的预约信息还在，所以需要做逻辑删除
+        boolean update = userAppInfoService.update(new LambdaUpdateWrapper<UserAppInfo>()
+                .in(UserAppInfo::getId, ids)
+                .eq(UserAppInfo::getUserId, userId)
+                .set(UserAppInfo::getUserId, null)
+        );
+        log.info("删除预约信息:{}",ids);
+        return toAjax(update);
     }
 
 

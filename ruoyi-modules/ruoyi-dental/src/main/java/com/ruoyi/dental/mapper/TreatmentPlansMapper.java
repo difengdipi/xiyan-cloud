@@ -1,0 +1,62 @@
+package com.ruoyi.dental.mapper;
+
+import com.ruoyi.dental.domain.TreatmentPlans;
+
+import java.util.List;
+
+/**
+ * 治疗计划Mapper接口
+ * 
+ * @author zh
+ * @date 2025-04-10
+ */
+public interface TreatmentPlansMapper 
+{
+    /**
+     * 查询治疗计划
+     * 
+     * @param planId 治疗计划主键
+     * @return 治疗计划
+     */
+    public TreatmentPlans selectTreatmentPlansByPlanId(Long planId);
+
+    /**
+     * 查询治疗计划列表
+     * 
+     * @param treatmentPlans 治疗计划
+     * @return 治疗计划集合
+     */
+    public List<TreatmentPlans> selectTreatmentPlansList(TreatmentPlans treatmentPlans);
+
+    /**
+     * 新增治疗计划
+     * 
+     * @param treatmentPlans 治疗计划
+     * @return 结果
+     */
+    public int insertTreatmentPlans(TreatmentPlans treatmentPlans);
+
+    /**
+     * 修改治疗计划
+     * 
+     * @param treatmentPlans 治疗计划
+     * @return 结果
+     */
+    public int updateTreatmentPlans(TreatmentPlans treatmentPlans);
+
+    /**
+     * 删除治疗计划
+     * 
+     * @param planId 治疗计划主键
+     * @return 结果
+     */
+    public int deleteTreatmentPlansByPlanId(Long planId);
+
+    /**
+     * 批量删除治疗计划
+     * 
+     * @param planIds 需要删除的数据主键集合
+     * @return 结果
+     */
+    public int deleteTreatmentPlansByPlanIds(Long[] planIds);
+}

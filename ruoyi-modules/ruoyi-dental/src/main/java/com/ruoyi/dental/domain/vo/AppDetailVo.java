@@ -39,7 +39,7 @@ public class AppDetailVo {
     private Short status;
     private Short appStatus;
     // 用户电话
-    private Long phone;
+    private String phone;
 
     // 用户身份证号
     private String idcard;

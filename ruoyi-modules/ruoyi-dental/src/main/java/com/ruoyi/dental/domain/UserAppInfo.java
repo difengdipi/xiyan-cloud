@@ -18,8 +18,9 @@ public class UserAppInfo {
     private Long scheduleId; //预约表id
     private String name;
     private Short status ; // 跟踪预约状态（0  预约成功 1  已完成  2 取消  ）
+    private Long patientId;
     private Short appStatus ; // 1 下午 2 下午
-    private Long phone; // 如果电话号码可能超过int范围，请考虑使用String类型
+    private String phone; // 如果电话号码可能超过int范围，请考虑使用String类型
     private String idcard; // 预约人的身份证号
     private String cancelReason;// 取消原因
     private Date createTime; // 创建时间

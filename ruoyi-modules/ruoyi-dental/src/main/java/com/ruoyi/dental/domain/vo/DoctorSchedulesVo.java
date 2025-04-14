@@ -31,6 +31,9 @@ public class DoctorSchedulesVo {
     private LocalDateTime createTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
+    @Excel(name = "最大预约数量", type = Excel.Type.EXPORT)
+    private Integer maxNum;
     @Excel(name = "预约数量", type = Excel.Type.EXPORT)
     private Integer appNum;
+
 }

@@ -36,5 +36,7 @@ public class DoctorSchedules {
     private LocalDateTime createTime;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
+    private Integer maxNum = 0;
     private Integer appNum = 0;
+
 }

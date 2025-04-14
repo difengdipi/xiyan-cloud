@@ -22,6 +22,7 @@ public class UserAppInfoDto {
     @Excel(name = "医生姓名", type = Excel.Type.ALL,prompt = "医生姓名")
     private String doctorName;// 医生姓名
     private Long scheduleId; //预约表id
+    private Long patientId; ////患者表id
     @Excel(name = "预约日期", type = Excel.Type.ALL,prompt = "预约日期")
     @DateTimeFormat(pattern = "yyyy/MM/dd")
     private Date scheduleDate; // 预约日期

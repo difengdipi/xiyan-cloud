@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.dental.mapper.TreatmentPlansMapper">
+
+    <resultMap type="com.ruoyi.dental.domain.TreatmentPlans" id="TreatmentPlansResult">
+        <result property="planId"    column="plan_id"    />
+        <result property="patientId"    column="patient_id"    />
+        <result property="userAppId"    column="user_app_id"    />
+        <result property="doctorId"    column="doctor_id"    />
+        <result property="treatmentPicture"    column="treatment_picture"    />
+        <result property="treatmentPlan"    column="treatment_plan"    />
+        <result property="skusId"    column="skus_id"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
+    <sql id="selectTreatmentPlansVo">
+        select plan_id, patient_id, user_app_id, treatment_picture, treatment_plan, created_time, updated_time from tb_treatment_plans
+    </sql>
+
+    <select id="selectTreatmentPlansList" parameterType="com.ruoyi.dental.domain.TreatmentPlans" resultMap="TreatmentPlansResult">
+        <include refid="selectTreatmentPlansVo"/>
+        <where>
+            <if test="patientId != null "> and patient_id = #{patientId}</if>
+            <if test="userAppId != null "> and user_app_id = #{userAppId}</if>
+            <if test="doctorId != null "> and doctor_id = #{doctorId}</if>
+            <if test="treatmentPicture != null  and treatmentPicture != ''"> and treatment_picture = #{treatmentPicture}</if>
+            <if test="treatmentPlan != null  and treatmentPlan != ''"> and treatment_plan = #{treatmentPlan}</if>
+            <if test="createdTime != null "> and created_time = #{createdTime}</if>
+            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+        </where>
+    </select>
+
+    <select id="selectTreatmentPlansByPlanId" parameterType="Long" resultMap="TreatmentPlansResult">
+        <include refid="selectTreatmentPlansVo"/>
+        where plan_id = #{planId}
+    </select>
+
+    <insert id="insertTreatmentPlans" parameterType="com.ruoyi.dental.domain.TreatmentPlans" useGeneratedKeys="true" keyProperty="planId">
+        insert into tb_treatment_plans
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="patientId != null">patient_id,</if>
+            <if test="userAppId != null">user_app_id,</if>
+            <if test="doctorId != null "> and doctor_id </if>
+            <if test="treatmentPicture != null">treatment_picture,</if>
+            <if test="treatmentPlan != null and treatmentPlan != ''">treatment_plan,</if>
+            <if test="skusId != null">skus_id,</if>
+            <if test="createdTime != null">created_time,</if>
+            <if test="updatedTime != null">updated_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="patientId != null">#{patientId},</if>
+            <if test="userAppId != null">#{userAppId},</if>
+            <if test="treatmentPicture != null">#{treatmentPicture},</if>
+            <if test="doctorId != null "> #{doctorId},</if>
+            <if test="treatmentPlan != null and treatmentPlan != ''">#{treatmentPlan},</if>
+            <if test="skusId != null">#{skusId},</if>
+            <if test="createdTime != null">#{createdTime},</if>
+            <if test="updatedTime != null">#{updatedTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTreatmentPlans" parameterType="com.ruoyi.dental.domain.TreatmentPlans">
+        update tb_treatment_plans
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="patientId != null">patient_id = #{patientId},</if>
+            <if test="userAppId != null">user_app_id = #{userAppId},</if>
+            <if test="treatmentPicture != null">treatment_picture = #{treatmentPicture},</if>
+            <if test="doctorId != null ">doctor_id = #{doctorId},</if>
+            <if test="treatmentPlan != null and treatmentPlan != ''">treatment_plan = #{treatmentPlan},</if>
+            <if test="createdTime != null">created_time = #{createdTime},</if>
+            <if test="skusId != null">skus_id = #{skusId},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+        </trim>
+        where plan_id = #{planId}
+    </update>
+
+    <delete id="deleteTreatmentPlansByPlanId" parameterType="Long">
+        delete from tb_treatment_plans where plan_id = #{planId}
+    </delete>
+
+    <delete id="deleteTreatmentPlansByPlanIds" parameterType="String">
+        delete from tb_treatment_plans where plan_id in
+        <foreach item="planId" collection="array" open="(" separator="," close=")">
+            #{planId}
+        </foreach>
+    </delete>
+</mapper>

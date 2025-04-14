@@ -61,4 +61,11 @@ public interface IDoctorSchedulesService  extends IService<DoctorSchedules>
      * @return 结果
      */
     public int deleteDoctorSchedulesById(Long id);
+
+    /**
+     * 根据scheduleId更新预约人数
+     * @param scheduleId
+     * @return
+     */
+    int updateByScheduleId(Long scheduleId);
 }
