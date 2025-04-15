@@ -2,6 +2,7 @@ package com.ruoyi.dental.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.web.domain.AjaxResult;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -210,4 +212,21 @@ public class DoctorSchedulesController extends BaseController
     {
         return toAjax(doctorSchedulesService.deleteDoctorSchedulesByIds(ids));
     }
+    @GetMapping("/all")
+    @Operation(summary = "获取今日的全部预约数据")
+    public R getNum(){
+        //获取今日预约数量，//直接去获取医生行程的预约量就可以
+        LocalDate today = LocalDate.now();
+
+        List<DoctorSchedules> list = doctorSchedulesService.list(
+                new LambdaQueryWrapper<DoctorSchedules>()
+                        .eq(DoctorSchedules::getDate, today)
+        );
+        Integer i = list.stream().map(DoctorSchedules::getAppNum).reduce(Integer::sum).get();
+        if(i == null || i == 0 ){
+            i = 0;
+        }
+        return R.ok(i);
+    }
+
 }
