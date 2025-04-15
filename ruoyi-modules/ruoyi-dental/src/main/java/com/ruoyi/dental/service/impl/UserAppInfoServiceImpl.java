@@ -1,6 +1,7 @@
 package com.ruoyi.dental.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.dental.domain.Dto.AdminUserAppinfoDto;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.vo.AppDetailVo;
 import com.ruoyi.dental.domain.vo.AppNumVo;
@@ -99,6 +100,12 @@ public class UserAppInfoServiceImpl extends ServiceImpl<UserAppInfoMapper, UserA
     {
         return userAppInfoMapper.deleteUserAppInfoById(id);
     }
+
+    @Override
+    public List<AdminUserAppinfoDto> listschedule() {
+        return userAppInfoMapper.listschedule();
+    }
+
     @Override
     public List<AppNumVo> getDoctorAppNum() {
         return userAppInfoMapper.getDoctorAppNum();

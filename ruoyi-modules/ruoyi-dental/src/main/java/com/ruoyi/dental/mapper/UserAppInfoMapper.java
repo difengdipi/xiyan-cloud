@@ -1,6 +1,7 @@
 package com.ruoyi.dental.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.dental.domain.Dto.AdminUserAppinfoDto;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.vo.AppDetailVo;
 import com.ruoyi.dental.domain.vo.AppNumVo;
@@ -68,4 +69,7 @@ public interface UserAppInfoMapper extends BaseMapper<UserAppInfo> {
      * @return 结果
      */
     public int deleteUserAppInfoByIds(Long[] ids);
+
+    List<AdminUserAppinfoDto> listschedule();
+
 }

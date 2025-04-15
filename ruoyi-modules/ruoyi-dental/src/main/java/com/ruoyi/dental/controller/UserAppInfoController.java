@@ -12,6 +12,7 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.Util.DentalUtils;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.dental.domain.DoctorSchedules;
+import com.ruoyi.dental.domain.Dto.AdminUserAppinfoDto;
 import com.ruoyi.dental.domain.Patients;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.vo.AppDetailReasonDto;
@@ -294,5 +295,18 @@ public class UserAppInfoController extends BaseController {
         return toAjax(update);
     }
 
+    @GetMapping("/all")
+    @Operation(summary = "获取全部预约数据")
+    public R getAll(){
+        return R.ok(userAppInfoService.list());
+    }
+
+
+    @Operation(summary = "患者饼状图")
+    @GetMapping("/picture")
+    public R<List<AdminUserAppinfoDto>> schedule(){
+        List<AdminUserAppinfoDto> list = userAppInfoService.listschedule();
+        return R.ok(list);
+    }
 
 }

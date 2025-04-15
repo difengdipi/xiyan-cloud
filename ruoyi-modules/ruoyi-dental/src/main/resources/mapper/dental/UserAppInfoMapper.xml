@@ -117,6 +117,28 @@
         <include refid="selectUserAppInfoVo"/>
         where id = #{id}
     </select>
+    <select id="listschedule" resultType="com.ruoyi.dental.domain.Dto.AdminUserAppinfoDto">
+        SELECT
+            count( 1 ) AS
+        VALUE
+        ,
+        STATUS,
+        CASE
+        STATUS
+            WHEN 0 THEN
+            '预约成功'
+            WHEN 1 THEN
+            '已完成'
+            WHEN 2 THEN
+            '取消'
+            WHEN 3 THEN
+            '就诊中' ELSE '未知状态'
+            END AS `name`
+        FROM
+        tb_user_app_info
+        GROUP BY
+        STATUS
+    </select>
 
     <insert id="insertUserAppInfo" parameterType="com.ruoyi.dental.domain.UserAppInfo">
         insert into tb_user_app_info
