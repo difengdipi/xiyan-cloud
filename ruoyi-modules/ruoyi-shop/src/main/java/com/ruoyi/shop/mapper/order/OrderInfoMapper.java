@@ -2,6 +2,7 @@ package com.ruoyi.shop.mapper.order;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.shop.domain.order.OrderInfo;
+import com.ruoyi.shop.domain.order.dto.OrderAdminInfoDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -63,5 +64,7 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
      * @return 结果
      */
     public int deleteOrderInfoByIds(Long[] ids);
+
+    List<OrderAdminInfoDto> listAll();
 
 }

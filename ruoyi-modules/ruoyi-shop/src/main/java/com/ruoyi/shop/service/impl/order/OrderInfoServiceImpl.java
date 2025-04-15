@@ -2,6 +2,7 @@ package com.ruoyi.shop.service.impl.order;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.shop.domain.order.OrderInfo;
+import com.ruoyi.shop.domain.order.dto.OrderAdminInfoDto;
 import com.ruoyi.shop.mapper.order.OrderInfoMapper;
 import com.ruoyi.shop.service.order.OrderInfoIService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +96,11 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     public int deleteOrderInfoById(Long id)
     {
         return orderInfoMapper.deleteOrderInfoById(id);
+    }
+
+    @Override
+    public List<OrderAdminInfoDto> listAll() {
+        return orderInfoMapper.listAll();
     }
 
 }

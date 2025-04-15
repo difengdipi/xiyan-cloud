@@ -1,6 +1,7 @@
 package com.ruoyi.shop.controller.order;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.web.domain.AjaxResult;
@@ -10,6 +11,7 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.redis.service.RedisService;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.shop.domain.order.OrderInfo;
+import com.ruoyi.shop.domain.order.dto.OrderAdminInfoDto;
 import com.ruoyi.shop.service.order.OrderInfoIService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,6 +55,13 @@ public class OrderInfoController extends BaseController
         List<OrderInfo> list = orderInfoService.selectOrderInfoList(orderInfo);
         redisService.setCacheList(CACHE_PREFIX,list);
         return getDataTable(list);
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "查询订单列表")
+    public R listAll(){
+        List<OrderAdminInfoDto> list = orderInfoService.listAll();
+        return R.ok(list);
     }
 
     /**

@@ -45,6 +45,16 @@
         <include refid="selectOrderInfoVo"/>
         where id = #{id}
     </select>
+    <select id="listAll" resultType="com.ruoyi.shop.domain.order.dto.OrderAdminInfoDto">
+        SELECT
+            count( 1 ) AS num,
+            sum( pay_money ) AS totalMoney,
+            order_state AS orderState
+        FROM
+            sys_order_info
+        GROUP BY
+            order_state
+    </select>
 
     <insert id="insertOrderInfo" parameterType="com.ruoyi.shop.domain.order.OrderInfo" useGeneratedKeys="true" keyProperty="id">
         insert into sys_order_info

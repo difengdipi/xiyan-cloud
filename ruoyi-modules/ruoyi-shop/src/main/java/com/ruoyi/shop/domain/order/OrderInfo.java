@@ -46,6 +46,7 @@ public class OrderInfo{
     /**快递单号*/
     @Excel(name = "快递单号",  type = Excel.Type.ALL)
     private String trackingNumber;
+
     /**
      * 倒计时--剩余的秒数
      * -1 表示已经超时，正数表示倒计时未结束

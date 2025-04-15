@@ -2,6 +2,7 @@ package com.ruoyi.shop.service.order;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.shop.domain.order.OrderInfo;
+import com.ruoyi.shop.domain.order.dto.OrderAdminInfoDto;
 
 import java.util.List;
 
@@ -62,4 +63,9 @@ public interface OrderInfoIService extends IService<OrderInfo> {
      */
     public int deleteOrderInfoById(Long id);
 
+    /**
+     * 管理前台的订单数据
+     * @return
+     */
+    List<OrderAdminInfoDto>  listAll();
 }
