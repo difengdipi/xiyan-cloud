@@ -57,7 +57,10 @@ public class OrderResultVo {
      * 收货人地址
      */
     private String receiverAddress;
-
+    /**
+     * 快递单号
+     */
+    private String trackingNumber;
     /**
      * 下单时间
      */

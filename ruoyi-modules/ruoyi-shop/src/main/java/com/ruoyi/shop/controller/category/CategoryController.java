@@ -62,8 +62,11 @@ public class CategoryController {
 
     @Operation(summary = "按照分类编号查询数据")
     @GetMapping(value = "/getCategoryById/{id}")
-    public R getByIdCategory(@PathVariable("id") Integer id) {
-        Category category = categoryService.getById(id);
+    public R getByIdCategory(@PathVariable("id") Long id) {
+        Category category = categoryService.getOne(
+                new LambdaQueryWrapper<Category>()
+                        .eq(Category::getCategoryId, id)
+        );
         return R.ok(category);
     }
 
