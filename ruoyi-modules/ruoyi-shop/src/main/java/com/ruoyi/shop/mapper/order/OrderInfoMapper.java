@@ -2,9 +2,13 @@ package com.ruoyi.shop.mapper.order;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.shop.domain.order.OrderInfo;
+import com.ruoyi.shop.domain.order.dto.IncomeTrendItemVO;
 import com.ruoyi.shop.domain.order.dto.OrderAdminInfoDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -66,5 +70,14 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
     public int deleteOrderInfoByIds(Long[] ids);
 
     List<OrderAdminInfoDto> listAll();
-
+    @Select("SELECT " +
+            "DATE_FORMAT(create_time, #{dateFormat}) AS date, " +
+            "SUM(pay_money) AS amount, " +
+            "COUNT(*) AS count " +
+            "FROM sys_order_info " +
+            "WHERE order_state in (4,5) " +  // 只查询已收货的订单
+            "AND create_time BETWEEN #{beginTime} AND #{endTime} " +
+            "GROUP BY date " +
+            "ORDER BY date ASC")
+    List<IncomeTrendItemVO> selectIncomeTrend(@Param("beginTime")LocalDateTime beginTime, @Param("endTime") LocalDateTime endTime,@Param("dateFormat") String dateFormatPattern);
 }

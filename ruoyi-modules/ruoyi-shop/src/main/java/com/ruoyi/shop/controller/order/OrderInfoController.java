@@ -11,17 +11,23 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.redis.service.RedisService;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.shop.domain.order.OrderInfo;
+import com.ruoyi.shop.domain.order.dto.IncomeTrendVO;
 import com.ruoyi.shop.domain.order.dto.OrderAdminInfoDto;
+import com.ruoyi.shop.service.order.IncomeService;
 import com.ruoyi.shop.service.order.OrderInfoIService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -188,4 +194,31 @@ public class OrderInfoController extends BaseController
         }
         return  success();
     }
+
+
+    @GetMapping("/income")
+    @Operation(summary = "收益曲线")
+    public R<IncomeTrendVO> getScheduleData(   @RequestParam @NotBlank(message = "timeRange is required")
+                                @Pattern(regexp = "week|month|year|custom", message = "Invalid timeRange. Allowed values: week, month, year, custom.")
+                                String timeRange,
+
+                                @RequestParam(required = false)
+                                @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                LocalDate startDate,
+
+                                @RequestParam(required = false)
+                                @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                LocalDate endDate){
+        if(!"custom".equals(timeRange)){
+           return R.ok (incomeService.getIncomeRange(timeRange));
+        }
+        if(startDate == null || endDate == null){
+            return R.fail("请选择时间范围");
+        }
+        IncomeTrendVO incomeTrend = incomeService.getIncomeTrend(timeRange, startDate, endDate);
+        return R.ok(incomeTrend);
+    }
+    @Autowired
+    IncomeService incomeService;
+
 }
