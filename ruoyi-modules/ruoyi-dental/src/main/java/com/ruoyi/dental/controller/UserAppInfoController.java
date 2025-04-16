@@ -285,7 +285,7 @@ public class UserAppInfoController extends BaseController {
     public AjaxResult remove(@PathVariable("ids") Long[] ids)
     {
         Long userId = DentalUtils.getUserId();
-        //TODO：用户端的删除只是删除了他所对应的用户的预约信息，但是数据库中的预约信息还在，所以需要做逻辑删除
+        //用户端的删除只是删除了他所对应的用户的预约信息，但是数据库中的预约信息还在，所以需要做逻辑删除
         boolean update = userAppInfoService.update(new LambdaUpdateWrapper<UserAppInfo>()
                 .in(UserAppInfo::getId, ids)
                 .eq(UserAppInfo::getUserId, userId)

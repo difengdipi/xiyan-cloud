@@ -59,7 +59,9 @@ public class OrderInfoController extends BaseController
     {
         startPage();
         List<OrderInfo> list = orderInfoService.selectOrderInfoList(orderInfo);
-        redisService.setCacheList(CACHE_PREFIX,list);
+        if(!list.isEmpty()){
+            redisService.setCacheList(CACHE_PREFIX,list);
+        }
         return getDataTable(list);
     }
 
@@ -83,7 +85,6 @@ public class OrderInfoController extends BaseController
         List<OrderInfo> list = null;
         if(redisService.hasKey(CACHE_PREFIX)){
             list = redisService.getCacheList(CACHE_PREFIX);
-
             util.exportExcel(response, list, "订单管理数据");
         }else {
             list = orderInfoService.selectOrderInfoList(orderInfo);

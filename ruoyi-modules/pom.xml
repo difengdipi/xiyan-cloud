@@ -16,6 +16,7 @@
         <module>ruoyi-shop</module>
         <module>ruoyi-dental</module>
         <module>ruoyi-member</module>
+        <module>ruoyi-sms</module>
     </modules>
 
     <artifactId>ruoyi-modules</artifactId>

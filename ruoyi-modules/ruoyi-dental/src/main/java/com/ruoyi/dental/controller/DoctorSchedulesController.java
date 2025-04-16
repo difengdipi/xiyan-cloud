@@ -216,7 +216,6 @@ public class DoctorSchedulesController extends BaseController
 
     public AjaxResult edit(@RequestBody DoctorSchedulesVo doctorSchedules)
     {
-        //TODO：如果医生修改了对应的预约状态和时间
         log.info("医生修改原因：{}",doctorSchedules);
 
         return toAjax(doctorSchedulesService.updateDoctorSchedules(doctorSchedules));
@@ -239,16 +238,16 @@ public class DoctorSchedulesController extends BaseController
     public R getNum(){
         //获取今日预约数量，//直接去获取医生行程的预约量就可以
         LocalDate today = LocalDate.now();
-
         List<DoctorSchedules> list = doctorSchedulesService.list(
                 new LambdaQueryWrapper<DoctorSchedules>()
                         .eq(DoctorSchedules::getDate, today)
         );
-        Integer i = list.stream().map(DoctorSchedules::getAppNum).reduce(Integer::sum).get();
-        if(i == null || i == 0 ){
-            i = 0;
+        Integer i = 0;
+        if(list.isEmpty()){
+            i = 0 ;
+        }else {
+            i = list.stream().map(DoctorSchedules::getAppNum).reduce(Integer::sum).get();
         }
         return R.ok(i);
     }
-
 }

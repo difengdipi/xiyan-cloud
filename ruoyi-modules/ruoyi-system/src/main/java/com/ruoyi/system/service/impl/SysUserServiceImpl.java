@@ -267,7 +267,7 @@ public class SysUserServiceImpl implements ISysUserService
 
     /**
      * 新增保存用户信息
-     *  TODO：新增用户时如果是新增医生，则需要创建医生信息表
+     *
      * 
      * @param user 用户信息
      * @return 结果

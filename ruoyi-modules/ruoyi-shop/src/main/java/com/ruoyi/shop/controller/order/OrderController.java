@@ -35,15 +35,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -120,6 +118,7 @@ public class OrderController {
     @PostMapping("")
     @Operation(summary="提交-订单")
     @Transactional
+//    TODO:这里有bug,当用户立即购买后无法创建创建订单的信息--之前的方案是根据购物车进行添加，但是目前来看有bug
     public R addOrder(@RequestBody OrderDto orderDto){
         //1.根据提交订单信息创建订单
         Order order = new Order();
@@ -130,37 +129,121 @@ public class OrderController {
         List<OrderSku> orderSkuList = new ArrayList<>();
         List<CartVo> cartVoList = orderDto.getGoods();
         List<String> skuids = cartVoList.stream().map(CartVo::getSkuId).map(String::valueOf).collect(Collectors.toList());
+        //3.查询购物车信息
         List<CartItem> list = carService.list(new LambdaQueryWrapper<CartItem>()
                 .eq(CartItem::getUserId, DentalUtils.getUserId())
                 .in(CartItem::getSkuId, cartVoList.stream().map(CartVo::getSkuId).collect(Collectors.toList()))
         );
-        //构造对应的orderSkuList
-        list.stream().forEach(cartItem -> {
-            orderSkuList.add(
-                    OrderSku.builder()
-                    .orderId(order.getId())
-                    .skuId(cartItem.getSkuId())
-                    .name(cartItem.getName())
-                    .spuId(cartItem.getGoodsId())
-                    .attrsText(cartItem.getAttrsText())
-                    .curPrice(cartItem.getNowPrice())
-                    .image(cartItem.getPicture().split(",")[0])
-                    .quantity(cartItem.getCount())
-                    .build());
-        });
-        //删除对应购物车商品
-        carService.remove(new LambdaQueryWrapper<CartItem>()
-                .eq(CartItem::getUserId, DentalUtils.getUserId())
-                .in(CartItem::getSkuId, cartVoList.stream().map(CartVo::getSkuId).collect(Collectors.toList()))
-        );
-        orderSkuService.saveBatch(orderSkuList);
-        //3.根据订单id创建订单详细表
+        BigDecimal reduce = BigDecimal.ZERO;
+        BigDecimal postFee = BigDecimal.ZERO;
+        //获取地址信息
         Address address = addressService.getById(orderDto.getAddressId());
+        //4.购物车中没有数据
+        if(list.isEmpty()){
+            //根据添加购物车的模式，进行添加订单
+            List<GoodsSkus> goodsSkulist = goodsSkuService.list(new LambdaQueryWrapper<GoodsSkus>().in(GoodsSkus::getSkuId, skuids));
+            //进行判断货物是否下架
+//            List<GoodsSkus> collect = goodsSkulist.stream().filter(Objects::isNull).collect(Collectors.toList());
+//            if(!ObjectUtils.isEmpty(collect)){
+//                return R.fail("包含已下架商品");
+//            }
+//            //进行判断货物是否有货
+            Map<Long, Integer> cartVoListMap = cartVoList.stream().collect(Collectors.toMap(CartVo::getSkuId, CartVo::getCount));
+//            List<GoodsSkus> collect1 = goodsSkulist.stream().filter(s -> s.getSkuInventory() < cartVoListMap.get(s.getSkuId())).collect(Collectors.toList());
+//            if(!ObjectUtils.isEmpty(collect1)){
+//                return R.fail("库存不足");
+//            }
+//            //规格map
+//            HashMap<Integer, List<String>> goodsSkulistMap = new HashMap<>();
+//            //属性文字map
+//            HashMap<Integer, String> attrsTextMap = new HashMap<>();
+//            goodsSkulist.stream().map(s->{
+//                goodsSkulistMap.put(s.getSkuId(),Utils.split(s.getSkuSpecsId()));
+//                return s;
+//            });
+//            //遍历规格map查找对应的属性文字
+//            goodsSkulistMap.forEach((k,v)->{
+//                StringBuilder attrsText = new StringBuilder();
+//                skusSpecService.list(new LambdaQueryWrapper<SkusSpec>()
+//                        .in(SkusSpec::getSpecId, v)
+//                ).forEach(skusSpec -> {
+//                    attrsText.append(skusSpec.getSpecName()).append(":").append(skusSpec.getSpecValueName()).append(" ");
+//                });
+//                attrsTextMap.put(k,attrsText.toString());
+//            });
+            //构造对应的orderSkuList
+            for (GoodsSkus goodsSkus : goodsSkulist) {
+                if (ObjectUtils.isEmpty(goodsSkus)) {
+                    return R.fail("商品已下架");
+                }
+                Long skuId = goodsSkus.getSkuId().longValue();
+                if (goodsSkus.getSkuInventory() < cartVoListMap.get(skuId)) {
+                    return R.fail("库存不足");
+                }
+                //根据skuId去查找对应的商品规格的信息，并拼接为对应的属性值
+                StringBuilder attrsText = new StringBuilder();
+                List<String> SkuSpecs = Utils.split(goodsSkus.getSkuSpecsId());
+                skusSpecService.list(new LambdaQueryWrapper<SkusSpec>()
+                        .in(SkusSpec::getSpecId, SkuSpecs)
+                ).forEach(skusSpec -> {
+                    attrsText.append(skusSpec.getSpecName()).append(":").append(skusSpec.getSpecValueName()).append(" ");
+                });
+                GoodsParticulars one = goodsPartsMapper.selectOne(new LambdaQueryWrapper<GoodsParticulars>()
+                        .like(GoodsParticulars::getSkusId, String.format(",%s,", goodsSkus.getSkuId()))
+                        // 或者处理首尾情况
+                        .or()
+                        .likeRight(GoodsParticulars::getSkusId, goodsSkus.getSkuId() + ",")
+                        .or()
+                    .likeLeft(GoodsParticulars::getSkusId, "," + goodsSkus.getSkuId())
+                    .or()
+                    .eq(GoodsParticulars::getSkusId, goodsSkus.getSkuId())
+                );
+            //根据商品编号去查名称
+            Goods goods = goodsService.getById(one.getGoodsId());
+            OrderSku build = OrderSku.builder()
+                    .orderId(order.getId())
+                    .skuId(Long.parseLong(goodsSkus.getSkuId().toString()))
+                    .name(goods.getGoodsName())
+                    .spuId(goods.getGoodsId())
+                    .attrsText(attrsText.toString())
+                    .curPrice(new BigDecimal(goodsSkus.getSkuPrice()))
+                    .image(one.getMainPictures().split(",")[1])
+                    .quantity(cartVoListMap.get(skuId))
+                    .createTime(LocalDateTime.now())
+                    .updateTime(LocalDateTime.now())
+                    .build();
+            orderSkuList.add(build);
+        }
+        orderSkuService.saveBatch(orderSkuList);
+        }else{
+            //构造对应的orderSkuList
+            list.stream().forEach(cartItem -> {
+                orderSkuList.add(
+                        OrderSku.builder()
+                                .orderId(order.getId())
+                                .skuId(cartItem.getSkuId())
+                                .name(cartItem.getName())
+                                .spuId(cartItem.getGoodsId())
+                                .attrsText(cartItem.getAttrsText())
+                                .curPrice(cartItem.getNowPrice())
+                                .image(cartItem.getPicture().split(",")[0])
+                                .quantity(cartItem.getCount())
+                                .createTime(LocalDateTime.now())
+                                .updateTime(LocalDateTime.now())
+                                .build());
+            });
+            //删除对应购物车商品
+            carService.remove(new LambdaQueryWrapper<CartItem>()
+                    .eq(CartItem::getUserId, DentalUtils.getUserId())
+                    .in(CartItem::getSkuId, cartVoList.stream().map(CartVo::getSkuId).collect(Collectors.toList()))
+            );
+            orderSkuService.saveBatch(orderSkuList);
+        }
         //计算总金额；
-        BigDecimal reduce = orderSkuList.stream()
+        reduce = orderSkuList.stream()
                 .map(orderSku -> orderSku.getCurPrice().multiply(BigDecimal.valueOf(orderSku.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal postFee = BigDecimal.valueOf(10);
+        postFee = BigDecimal.valueOf(10);
         if(reduce.compareTo(BigDecimal.valueOf(20)) > 0){
             postFee = BigDecimal.valueOf(0);
         }
@@ -359,9 +442,7 @@ public class OrderController {
     SkusSpecService skusSpecService;
     @GetMapping("/pre/now")
     @Operation(summary = "获取立即购买订单")
-    //TODO： 有bug,立即购买后，下单，商品价格不对
     public R OrderPreNow(@RequestParam Long skuId,@RequestParam Long count ,@RequestParam(defaultValue = "-1") Long addressId){
-
         LambdaQueryWrapper<Address> eq = new LambdaQueryWrapper<Address>()
                 .eq(Address::getUserId, DentalUtils.getUserId());
         if(Long.compare(addressId, -1L) != 0){
@@ -420,4 +501,5 @@ public class OrderController {
                 .summary(summary)
                 .build());
     }
+
 }
