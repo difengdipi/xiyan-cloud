@@ -1,8 +1,10 @@
 package com.ruoyi.shop.domain.order;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.annotation.Excel;
+import com.ruoyi.shop.config.ListTypeHandler;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -57,6 +59,7 @@ public class OrderInfo{
      * 商品集合 [ 商品信息 ]
      */
     @Excel(name = "商品集合", type = Excel.Type.EXPORT)
+    @TableField(typeHandler = ListTypeHandler.class)
     private List<String> skusId;
 
     /**
