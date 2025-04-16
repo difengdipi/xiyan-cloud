@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -118,7 +119,6 @@ public class OrderController {
     @PostMapping("")
     @Operation(summary="提交-订单")
     @Transactional
-//    TODO:这里有bug,当用户立即购买后无法创建创建订单的信息--之前的方案是根据购物车进行添加，但是目前来看有bug
     public R addOrder(@RequestBody OrderDto orderDto){
         //1.根据提交订单信息创建订单
         Order order = new Order();
@@ -282,6 +282,12 @@ public class OrderController {
         );
         OrderResultVo orderResultVo = new OrderResultVo();
         BeanUtils.copyProperties(orderInfo,orderResultVo);
+        if(orderInfo.getOrderState() == 1 && orderInfo.getCountdown() > 0 ){
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime createTime = orderInfo.getCreateTime().plusMinutes(5);
+            long seconds = Duration.between(now, createTime).getSeconds();
+            orderResultVo.setCountdown((int) seconds);
+        }
         orderResultVo.setSkus(
                 list.stream().map(orderSku -> OrderSkuVo.builder()
                         .id(orderSku.getId())
@@ -305,7 +311,7 @@ public class OrderController {
     public R getOrderList(@RequestParam Integer orderState,
                           @RequestParam(defaultValue = "1") Integer page,
                           @RequestParam(defaultValue = "10") Integer pageSize){
-        //TODO：分页查询未实现
+//        TODO:这个地方感觉有bug,应该是分页查询没有成功
         //1.根据订单id 左连接查询订单详情表中的orderState---做分页---在去查询ordersku表中的信息
         Long userId = DentalUtils.getUserId();
         List<OrderResultVo> orderResultVo = orderMapper.selectOrderState(userId,orderState);
