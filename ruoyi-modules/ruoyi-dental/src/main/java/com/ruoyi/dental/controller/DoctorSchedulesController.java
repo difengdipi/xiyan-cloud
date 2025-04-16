@@ -12,9 +12,11 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.dental.domain.DoctorSchedules;
 import com.ruoyi.dental.domain.Doctors;
+import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.vo.DoctorSchedulesVo;
 import com.ruoyi.dental.service.IDoctorSchedulesService;
 import com.ruoyi.dental.service.IDoctorsService;
+import com.ruoyi.dental.service.IUserAppInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
@@ -173,6 +175,21 @@ public class DoctorSchedulesController extends BaseController
     {
         return success(doctorSchedulesService.selectDoctorSchedulesById(id));
     }
+
+    @Autowired
+    IUserAppInfoService userAppInfoService;
+
+    @RequiresPermissions("dental:schedules:show")
+    @GetMapping("/show")
+    @Operation(summary = "获取医生行程取消原因")
+    public R showReason(@RequestParam(required = true)Long id){
+        //通过行程id号去同步用户预约的表
+        UserAppInfo one = userAppInfoService.getOne(new LambdaQueryWrapper<UserAppInfo>()
+                .eq(UserAppInfo::getScheduleId, id)
+        );
+        return R.ok(one.getCancelReason());
+    }
+
 
     /**
      * 新增医生行程
