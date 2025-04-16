@@ -42,7 +42,7 @@ public class OrderStatusSchedule {
                 List<OrderInfo> collect = list.stream()
                         .filter(orderInfo -> orderInfo.getOrderState() == 1)
                         .map(orderInfo -> {
-                            LocalDateTime localDateTime = orderInfo.getCreateTime().plusSeconds(60);
+                            LocalDateTime localDateTime = orderInfo.getCreateTime().plusSeconds(5*60);
                             LocalDateTime now = LocalDateTime.now();
                             if (localDateTime.isBefore(now)) {
                                 orderInfo.setOrderState(6);

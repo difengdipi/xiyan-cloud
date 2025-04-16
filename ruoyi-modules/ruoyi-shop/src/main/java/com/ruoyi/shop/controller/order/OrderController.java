@@ -282,11 +282,16 @@ public class OrderController {
         );
         OrderResultVo orderResultVo = new OrderResultVo();
         BeanUtils.copyProperties(orderInfo,orderResultVo);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime createTime = orderInfo.getCreateTime().plusMinutes(5);
+        long seconds = Duration.between(now, createTime).getSeconds();
         if(orderInfo.getOrderState() == 1 && orderInfo.getCountdown() > 0 ){
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime createTime = orderInfo.getCreateTime().plusMinutes(5);
-            long seconds = Duration.between(now, createTime).getSeconds();
             orderResultVo.setCountdown((int) seconds);
+        }
+        if(orderInfo.getOrderState() == 1 && seconds <= 0){
+            orderInfo.setCountdown(-1);
+            orderInfo.setOrderState(6);
+            orderInfoService.updateById(orderInfo);
         }
         orderResultVo.setSkus(
                 list.stream().map(orderSku -> OrderSkuVo.builder()
