@@ -185,6 +185,7 @@ public class DoctorSchedulesController extends BaseController
     {
         DoctorSchedules doctorSchedules1 = new DoctorSchedules();
         BeanUtils.copyProperties(doctorSchedules, doctorSchedules1);
+        doctorSchedules1.setCreateTime(LocalDateTime.now());
         return toAjax(doctorSchedulesService.save(doctorSchedules1));
     }
 

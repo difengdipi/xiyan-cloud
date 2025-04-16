@@ -24,8 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 医生信息Controller
@@ -131,10 +135,28 @@ public class DoctorsController extends BaseController
     @Operation(summary = "获取今日在线医生")
     @GetMapping("/infos")
     public R getDockersInfo(){
+        //小程序端获取今日在线医生，需要获取的是今日或者未来行程安排中拥有的而不是全部渲染
         List<Doctors> list = doctorsService.list(new LambdaQueryWrapper<Doctors>()
                 .eq(Doctors::getStatus,1)
         );
-        return  R.ok(list);
+        //判断当前时间是否超过18:00，超过则不显示
+        LocalDate today = LocalDate.now();
+        if(LocalDateTime.now().getHour()>=18){
+            today = today.plusDays(1);
+        }
+        LocalDate tomorrow = today.plusDays(14);
+        List<DoctorSchedules> schedulesList = doctorSchedulesService.list(
+                new LambdaQueryWrapper<DoctorSchedules>()
+                        .between(DoctorSchedules::getDate, today, tomorrow)
+                        .notIn(DoctorSchedules::getStatus, 0)
+        );
+        Map<Long, DoctorSchedules> collect = schedulesList.stream()
+                .collect(
+                        Collectors.toMap(DoctorSchedules::getDoctorId,
+                                doctorSchedules -> doctorSchedules));
+        List<Doctors> collect1 = list.stream()
+                .filter(doctor -> collect.containsKey(doctor.getId())).collect(Collectors.toList());
+        return  R.ok(collect1);
     }
 
     @Operation(summary = "根据医生id获取医生信息")
