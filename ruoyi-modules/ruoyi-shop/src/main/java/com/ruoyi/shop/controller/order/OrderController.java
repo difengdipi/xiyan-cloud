@@ -2,6 +2,8 @@ package com.ruoyi.shop.controller.order;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.bean.BeanUtils;
 import com.ruoyi.common.security.Util.DentalUtils;
@@ -107,6 +109,9 @@ public class OrderController {
                 .build());
     }
 
+    @Autowired
+    GoodsSkusService goodsSkuService;
+
     /**
      *
      * @param orderDto
@@ -129,7 +134,6 @@ public class OrderController {
                 .eq(CartItem::getUserId, DentalUtils.getUserId())
                 .in(CartItem::getSkuId, cartVoList.stream().map(CartVo::getSkuId).collect(Collectors.toList()))
         );
-
         //构造对应的orderSkuList
         list.stream().forEach(cartItem -> {
             orderSkuList.add(
@@ -222,6 +226,7 @@ public class OrderController {
         //1.根据订单id 左连接查询订单详情表中的orderState---做分页---在去查询ordersku表中的信息
         Long userId = DentalUtils.getUserId();
         List<OrderResultVo> orderResultVo = orderMapper.selectOrderState(userId,orderState);
+        Page<OrderListResult> objects = PageHelper.startPage(page, pageSize);
         OrderListResult orderListResult = new OrderListResult();
         List<OrderItem> items = new ArrayList<>();
         orderResultVo.forEach(orderResultVo1 -> {
@@ -233,9 +238,9 @@ public class OrderController {
         //获取对应的分页参数
         // 4. 获取分页信息（使用PageInfo包装查询结果）
         orderListResult.setItems(items);
-        orderListResult.setPage(page);
-        orderListResult.setPages(orderResultVo.size());
-        orderListResult.setPageSize(orderResultVo.size());
+        orderListResult.setPage(objects.getPages());
+        orderListResult.setPages(objects.getPageNum());
+        orderListResult.setPageSize(objects.getPageSize());
         return R.ok(orderListResult);
     }
 
@@ -354,6 +359,7 @@ public class OrderController {
     SkusSpecService skusSpecService;
     @GetMapping("/pre/now")
     @Operation(summary = "获取立即购买订单")
+    //TODO： 有bug,立即购买后，下单，商品价格不对
     public R OrderPreNow(@RequestParam Long skuId,@RequestParam Long count ,@RequestParam(defaultValue = "-1") Long addressId){
 
         LambdaQueryWrapper<Address> eq = new LambdaQueryWrapper<Address>()

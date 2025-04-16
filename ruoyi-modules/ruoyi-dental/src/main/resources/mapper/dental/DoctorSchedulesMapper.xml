@@ -112,11 +112,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         delete from tb_doctor_schedules where id = #{id}
     </delete>
 
-    <delete id="deleteDoctorSchedulesByIds" parameterType="String">
-        delete from tb_doctor_schedules where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
+
 
 </mapper>

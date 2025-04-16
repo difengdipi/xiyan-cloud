@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Address {
 
     @TableId(type = IdType.AUTO) // 主键自增
-    private Integer id; // 地址ID
+    private Long id; // 地址ID
 
     private Long userId; // 用户id
 

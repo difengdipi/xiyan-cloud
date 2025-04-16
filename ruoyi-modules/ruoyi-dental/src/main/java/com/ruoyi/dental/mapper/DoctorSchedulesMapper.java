@@ -60,11 +60,12 @@ public interface DoctorSchedulesMapper extends BaseMapper<DoctorSchedules> {
         /**
          * 批量删除医生行程
          *
-         * @param ids 需要删除的数据主键集合
+         * @param ids    需要删除的数据主键集合
+         * @param reason
          * @return 结果
          */
-        public int deleteDoctorSchedulesByIds(Long[] ids);
+        public int deleteDoctorSchedulesByIds(Long[] ids, String reason);
 
-    int updateByScheduleId(Long scheduleId);
+        int updateByScheduleId(Long scheduleId);
 
 }

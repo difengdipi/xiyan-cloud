@@ -19,6 +19,7 @@ public class DoctorSchedulesVo {
     @Excel(name = "医生姓名", type = Excel.Type.ALL)
     private String doctorName;
     // 预约日期
+    private String cancelReason;
     // 预约日期
     @JsonProperty("date")
     @DateTimeFormat (pattern = "yyyy/MM/dd")

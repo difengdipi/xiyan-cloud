@@ -69,7 +69,7 @@ public class AddressController {
     // 获取收货地址详情
     @GetMapping("/{id}")
     @Operation(summary = "获取收货地址详情")
-    public R<Address> getAddressById(@PathVariable("id") Integer id) {
+    public R<Address> getAddressById(@PathVariable("id") Long id) {
         Address address = addressService.getById(id);
 
         if (address == null) {
@@ -81,7 +81,7 @@ public class AddressController {
     // 修改收货地址
     @PutMapping("/{id}")
     @Operation(summary = "修改收货地址")
-    public R updateAddress(@PathVariable("id") Integer id, @RequestBody Address address) {
+    public R updateAddress(@PathVariable("id") Long id, @RequestBody Address address) {
         address.setId(id);
         Long userId = DentalUtils.getUserId();
         if(address.getIsDefault() == 1){

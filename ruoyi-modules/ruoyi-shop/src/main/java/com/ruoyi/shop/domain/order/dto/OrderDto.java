@@ -22,7 +22,7 @@ public class OrderDto {
     /** 订单备注 */
     private String buyerMessage;
     /** 商品集合[ 商品信息 ] */
-    List<CartVo> goods;
+    private List<CartVo> goods;
     /** 支付渠道：支付渠道，1支付宝、2微信--支付方式为在线支付时，传值，为货到付款时，不传值 */
     private short payChannel;
     /** 支付方式，1为在线支付，2为货到付款 */

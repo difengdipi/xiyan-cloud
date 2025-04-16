@@ -48,11 +48,12 @@ public interface IDoctorSchedulesService  extends IService<DoctorSchedules>
 
     /**
      * 批量删除医生行程
-     * 
-     * @param ids 需要删除的医生行程主键集合
+     *
+     * @param ids    需要删除的医生行程主键集合
+     * @param reason
      * @return 结果
      */
-    public int deleteDoctorSchedulesByIds(Long[] ids);
+    public int deleteDoctorSchedulesByIds(Long[] ids, String reason);
 
     /**
      * 删除医生行程信息

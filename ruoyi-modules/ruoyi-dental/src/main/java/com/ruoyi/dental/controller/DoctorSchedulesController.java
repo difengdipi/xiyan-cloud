@@ -198,6 +198,9 @@ public class DoctorSchedulesController extends BaseController
 
     public AjaxResult edit(@RequestBody DoctorSchedulesVo doctorSchedules)
     {
+        //TODO：如果医生修改了对应的预约状态和时间
+        log.info("医生修改原因：{}",doctorSchedules);
+
         return toAjax(doctorSchedulesService.updateDoctorSchedules(doctorSchedules));
     }
 
@@ -208,11 +211,10 @@ public class DoctorSchedulesController extends BaseController
     @Log(title = "医生行程", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     @Operation(summary = "删除医生行程")
-
-    public AjaxResult remove(@PathVariable("ids") Long[] ids)
+    public AjaxResult remove(@PathVariable("ids") Long[] ids,@RequestParam(required = true, defaultValue = "店铺容量满，请到店挂号")String reason)
     {
-        log.info("删除医生行程:{}",ids);
-        return toAjax(doctorSchedulesService.deleteDoctorSchedulesByIds(ids));
+
+        return toAjax(doctorSchedulesService.deleteDoctorSchedulesByIds(ids,reason));
     }
     @GetMapping("/all")
     @Operation(summary = "获取今日的全部预约数据")
