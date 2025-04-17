@@ -1,9 +1,11 @@
 package com.ruoyi.dental.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.common.core.annotation.Excel;
+import com.ruoyi.common.core.web.domain.BaseEntity;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 医生信息对象 tb_doctors
@@ -12,7 +14,7 @@ import java.time.LocalDateTime;
  * @date 2025-04-09
  */
 @Data
-public class Doctors
+public class Doctors extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
@@ -22,7 +24,7 @@ public class Doctors
     /** 关联的用户id */
     @Excel(name = "医生工号")
     private Long userId;
-
+    private Long deptId;
     /** 医生姓名 */
     @Excel(name = "医生姓名")
     private String name;
@@ -50,11 +52,14 @@ public class Doctors
     /** 详细介绍 */
     @Excel(name = "详细介绍")
     private String detail;
+    /** 请求参数 */
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+
 
     /** 总预约数量 */
     @Excel(name = "总预约数量")
     private Long appNum = 0L;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
+    private Date createTime;
+    private Date updateTime;
 
 }

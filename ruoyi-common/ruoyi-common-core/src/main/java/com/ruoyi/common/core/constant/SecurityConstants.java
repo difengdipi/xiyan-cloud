@@ -18,6 +18,10 @@ public class SecurityConstants
     public static final String DETAILS_USERNAME = "username";
 
     /**
+     * 部门ID字段
+     */
+    public static final String DETATLS_DEPT_ID = "dept_id";
+    /**
      * 授权信息字段
      */
     public static final String AUTHORIZATION_HEADER = "Authorization";

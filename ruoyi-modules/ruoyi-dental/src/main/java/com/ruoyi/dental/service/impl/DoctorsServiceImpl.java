@@ -3,6 +3,7 @@ package com.ruoyi.dental.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.datascope.annotation.DataScope;
 import com.ruoyi.dental.domain.Doctors;
 import com.ruoyi.dental.mapper.DoctorsMapper;
 import com.ruoyi.dental.service.IDoctorsService;
@@ -10,8 +11,8 @@ import com.ruoyi.system.api.domain.SysUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,6 +48,7 @@ public class DoctorsServiceImpl extends ServiceImpl<DoctorsMapper,Doctors> imple
      * @return 医生信息
      */
     @Override
+    @DataScope(deptAlias = "tds", userAlias = "tds")
     public List<Doctors> selectDoctorsList(Doctors doctors)
     {
         return doctorsMapper.selectDoctorsList(doctors);
@@ -121,7 +123,7 @@ public class DoctorsServiceImpl extends ServiceImpl<DoctorsMapper,Doctors> imple
         doctors.setUserId(sysUser.getUserId());
         doctors.setName(sysUser.getNickName());
         doctors.setStatus(0L);
-        doctors.setCreateTime(LocalDateTime.now());
+        doctors.setCreateTime(new Date());
         return doctorsMapper.insert(doctors) > 1 ? R.ok() : R.fail("创建医生信息失败");
     }
 }

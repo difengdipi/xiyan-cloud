@@ -93,6 +93,7 @@ public class DoctorsController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody Doctors doctors)
     {
+        doctors.setDeptId(getDeptId());
         return toAjax(doctorsService.insertDoctors(doctors));
     }
 
