@@ -1,6 +1,7 @@
 package com.ruoyi.dental.domain.vo;
 
 import com.ruoyi.common.core.annotation.Excel;
+import com.ruoyi.common.core.web.domain.BaseEntity;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -14,7 +15,7 @@ import java.util.Date;
  * @Version :
  **/
 @Data
-public class UserAppInfoDto {
+public class UserAppInfoDto extends BaseEntity {
     @Excel(name = "医生工号", type = Excel.Type.ALL, cellType = Excel.ColumnType.NUMERIC, prompt = "工号")
     private Long id; // 使用Long类型以匹配数据库中的bigint(20)
     private Long userId; // 使用Integer匹配int(11)

@@ -1,6 +1,7 @@
 package com.ruoyi.dental.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.datascope.annotation.DataScope;
 import com.ruoyi.dental.domain.Dto.AdminUserAppinfoDto;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.vo.AppDetailVo;
@@ -46,6 +47,7 @@ public class UserAppInfoServiceImpl extends ServiceImpl<UserAppInfoMapper, UserA
      * @return 预约
      */
     @Override
+    @DataScope(deptAlias = "td", userAlias = "td")
     public List<UserAppInfoDto> selectUserAppInfoList(UserAppInfoDto userAppInfo)
     {
         return userAppInfoMapper.selectUserAppInfoList(userAppInfo);

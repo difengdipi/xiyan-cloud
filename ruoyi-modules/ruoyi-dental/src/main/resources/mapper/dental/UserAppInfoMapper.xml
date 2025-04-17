@@ -109,6 +109,7 @@
             <if test="idcard != null and idcard != ''"> AND uai.idcard = #{idcard}</if>
             <if test="cancelReason != null and cancelReason != ''"> AND uai.cancel_reason LIKE CONCAT('%', #{cancelReason}, '%')</if>
             <if test="scheduleDate !=null">  AND DATE(tds.date) = DATE(#{scheduleDate})</if>
+            ${params.dataScope}
         </where>
         ORDER BY uai.create_time DESC
     </select>
