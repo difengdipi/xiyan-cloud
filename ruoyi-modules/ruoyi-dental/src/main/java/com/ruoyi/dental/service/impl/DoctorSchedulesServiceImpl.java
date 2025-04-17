@@ -2,6 +2,7 @@ package com.ruoyi.dental.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.datascope.annotation.DataScope;
 import com.ruoyi.dental.domain.DoctorSchedules;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.vo.DoctorSchedulesVo;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -48,6 +50,7 @@ public class DoctorSchedulesServiceImpl extends ServiceImpl<DoctorSchedulesMappe
      * @return 医生行程
      */
     @Override
+    @DataScope(deptAlias = "sc", userAlias = "sc")
     public List<DoctorSchedulesVo> selectDoctorSchedulesList(DoctorSchedulesVo doctorSchedules)
     {
         return doctorSchedulesMapper.selectDoctorSchedulesList(doctorSchedules);
@@ -75,7 +78,7 @@ public class DoctorSchedulesServiceImpl extends ServiceImpl<DoctorSchedulesMappe
     @Override
     public int updateDoctorSchedules(DoctorSchedulesVo doctorSchedules)
     {
-        doctorSchedules.setUpdateTime(LocalDateTime.now());
+        doctorSchedules.setUpdateTime(new Date());
         return doctorSchedulesMapper.updateDoctorSchedules(doctorSchedules);
     }
 

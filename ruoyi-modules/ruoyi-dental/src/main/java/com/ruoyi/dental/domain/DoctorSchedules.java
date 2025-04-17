@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ruoyi.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,10 +27,12 @@ public class DoctorSchedules {
 
     private Long doctorId;
     // 预约日期
-    @JsonProperty("date")
-    // 统一使用java.util.Date
+    @Excel(name = "医生工号")
+    private Long userId;
+    private Long deptId;
     @DateTimeFormat(pattern = "yyyy/MM/dd")
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonProperty("date")
     private Date date;
     private Integer status; // 可预约类型（0 不可预约, 1 上午可预约, 2 下午可预约, 3 全天可约）
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

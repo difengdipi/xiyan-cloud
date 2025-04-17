@@ -30,10 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -110,20 +108,23 @@ public class DoctorSchedulesController extends BaseController
                     if(ObjectUtils.isEmpty(doctors)){
                         return s;
                     }
+                    s.setUserId(doctors.getUserId());
                     s.setDoctorName(doctors.getName());
+                    s.setDeptId(doctors.getDeptId());
                     s.setDoctorId(doctors.getId());
-                    s.setCreateTime(LocalDateTime.now());
+                    s.setCreateTime(new Date());
                     return s;
                 }).collect(Collectors.toList());
                     ArrayList< DoctorSchedules> objects = new ArrayList<>();
-
                     doctorSchedulesVoslist.stream().forEach(doctorSchedulesVo -> {
                         DoctorSchedules build = DoctorSchedules.builder()
                                 .doctorId(doctorSchedulesVo.getDoctorId())
+                                .userId(doctorSchedulesVo.getUserId())
+                                .deptId(doctorSchedulesVo.getDeptId())
                                 .date(doctorSchedulesVo.getDate())
                                 .status(doctorSchedulesVo.getStatus())
                                 .maxNum(doctorSchedulesVo.getMaxNum())
-                                .createTime(doctorSchedulesVo.getCreateTime())
+                                .createTime(doctorSchedulesVo.getCreateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
                                 .build();
                         LambdaQueryWrapper<DoctorSchedules> eq = new LambdaQueryWrapper<DoctorSchedules>()
                                 .eq(DoctorSchedules::getDoctorId, build.getDoctorId())
@@ -202,6 +203,10 @@ public class DoctorSchedulesController extends BaseController
     {
         DoctorSchedules doctorSchedules1 = new DoctorSchedules();
         BeanUtils.copyProperties(doctorSchedules, doctorSchedules1);
+        //获取对应的医生信息设置部门和用户
+        Doctors byId = doctorService.getById(doctorSchedules1.getDoctorId());
+        doctorSchedules1.setUserId(byId.getUserId());
+        doctorSchedules1.setDeptId(byId.getDeptId());
         doctorSchedules1.setCreateTime(LocalDateTime.now());
         return toAjax(doctorSchedulesService.save(doctorSchedules1));
     }

@@ -26,9 +26,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -151,12 +153,10 @@ public class DoctorsController extends BaseController
                         .between(DoctorSchedules::getDate, today, tomorrow)
                         .notIn(DoctorSchedules::getStatus, 0)
         );
-        Map<Long, DoctorSchedules> collect = schedulesList.stream()
-                .collect(
-                        Collectors.toMap(DoctorSchedules::getDoctorId,
-                                doctorSchedules -> doctorSchedules));
-        List<Doctors> collect1 = list.stream()
-                .filter(doctor -> collect.containsKey(doctor.getId())).collect(Collectors.toList());
+        //获取行程表中去重后的医生id
+        Set<Long> collect = schedulesList.stream().map(DoctorSchedules::getDoctorId).collect(Collectors.toSet());
+        //根据去重后的医生id获取医生信息
+        List<Doctors> collect1 = list.stream().filter(doctors -> collect.contains(doctors.getId())).collect(Collectors.toList());
         return  R.ok(collect1);
     }
 
@@ -172,9 +172,34 @@ public class DoctorsController extends BaseController
     @GetMapping("/AppointSchedule/{id}")
     public R getAppointmentSchedule(@PathVariable("id")Long id)
     {
+        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
+        // 固定早上8点作为一天的开始
+        LocalDateTime todayStart = today.atTime(8, 0);
+        // 设置查询结束时间为14天后
+        LocalDateTime endDateTime = today.plusDays(14).atTime(23, 59, 59);
+        // 调整查询开始时间
+        List<Integer> status = null;
+        if (now.getHour() >= 18) {
+            // 18点后，预约从明天8点开始
+            todayStart = today.plusDays(1).atTime(8, 0);
+            endDateTime = today.plusDays(15).atTime(23, 59, 59);
+        } else if (now.getHour() > 9) {
+            // 9点后但未到18点，从当前时间开始查询
+            todayStart = now;
+            status = Arrays.asList(2, 3);
+        }
+        Date startDate = Date.from(todayStart.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        LambdaQueryWrapper<DoctorSchedules> between = new LambdaQueryWrapper<DoctorSchedules>()
+                .eq(DoctorSchedules::getDoctorId, id)
+                .between(DoctorSchedules::getDate, startDate, endDate);
+        // 查询数据库
+        if(!(status == null)){
+            between.in(DoctorSchedules::getStatus, status);
+        }
         List<DoctorSchedules> list = doctorSchedulesService.list(
-                new LambdaQueryWrapper<DoctorSchedules>().eq(DoctorSchedules::getDoctorId,id)
-                        .gt(DoctorSchedules::getDate,new Date())
+                between
         );
         return R.ok(list);
     }

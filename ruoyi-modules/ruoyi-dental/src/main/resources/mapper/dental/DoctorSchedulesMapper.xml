@@ -31,7 +31,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectDoctorSchedulesVo">
         select sc.id, sc.doctor_id, doc.user_id as user_id,doc.name as doctor_name,
                sc.date, sc.status, sc.create_time, sc.update_time,
-               sc.app_num , sc.max_num from tb_doctor_schedules as sc
+               sc.app_num , sc.max_num
+        from tb_doctor_schedules as sc
         left join tb_doctors as doc on sc.doctor_id = doc.id
     </sql>
 
@@ -47,6 +48,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="date != null"> and date = #{date}</if>
             <if test="status != null"> and sc.status = #{status}</if>
             <if test="appNum != null"> and app_num = #{appNum}</if>
+            ${params.dataScope}
         </where>
         order by
         case
@@ -58,7 +60,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectDoctorSchedulesById" parameterType="Long" resultMap="DoctorSchedulesVoResult">
         <include refid="selectDoctorSchedulesVo"/>
-        where sc.id = #{id}
+        where sc.doctor_id= #{id}
     </select>
 
     <insert id="insertDoctorSchedules" parameterType="com.ruoyi.dental.domain.DoctorSchedules">
