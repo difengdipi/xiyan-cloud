@@ -70,5 +70,8 @@
                 AND  info.order_state = #{orderState}
             </if>
         </where>
+--         根据时间排序
+        ORDER BY
+            order1.create_time DESC
     </select>
 </mapper>

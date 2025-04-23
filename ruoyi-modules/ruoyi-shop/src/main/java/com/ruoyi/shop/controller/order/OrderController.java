@@ -7,6 +7,7 @@ import com.github.pagehelper.PageHelper;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.bean.BeanUtils;
 import com.ruoyi.common.security.Util.DentalUtils;
+import com.ruoyi.shop.component.OrderProduce;
 import com.ruoyi.shop.config.Utils;
 import com.ruoyi.shop.domain.address.Address;
 import com.ruoyi.shop.domain.cart.CartItem;
@@ -43,6 +44,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -111,6 +113,8 @@ public class OrderController {
     @Autowired
     GoodsSkusService goodsSkuService;
 
+    @Autowired
+    OrderProduce orderProduce;
     /**
      *
      * @param orderDto
@@ -247,6 +251,7 @@ public class OrderController {
         if(reduce.compareTo(BigDecimal.valueOf(20)) > 0){
             postFee = BigDecimal.valueOf(0);
         }
+
         OrderInfo build = OrderInfo.builder()
                 .orderId(order.getId())
                 .orderState(1)
@@ -261,6 +266,9 @@ public class OrderController {
                 .createTime(LocalDateTime.now())
                 .updateTime(LocalDateTime.now())
                 .build();
+        CompletableFuture.runAsync(()->{
+            orderProduce.sendOver(order.getId());
+        });
         orderInfoService.save(build);
         return R.ok(order.getId());
     }
@@ -513,4 +521,15 @@ public class OrderController {
                 .build());
     }
 
+
+    public R<Boolean> UpdateOrderStatus(Long id){
+        boolean update = orderInfoService.update(new LambdaUpdateWrapper<OrderInfo>()
+                .eq(OrderInfo::getOrderId, id)
+                .eq(OrderInfo::getOrderState, 1)
+                .set(OrderInfo::getOrderState, 6)
+                .set(OrderInfo::getCountdown, -1)
+                .set(OrderInfo::getCancelReason,"订单超时")
+        );
+        return R.ok(update);
+    }
 }
