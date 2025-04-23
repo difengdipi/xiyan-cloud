@@ -142,6 +142,8 @@ public class OrderController {
         BigDecimal postFee = BigDecimal.ZERO;
         //获取地址信息
         Address address = addressService.getById(orderDto.getAddressId());
+//        商品库存数据
+        Map<Long, Integer> cartVoListMap  = cartVoList.stream().collect(Collectors.toMap(CartVo::getSkuId, CartVo::getCount));
         //4.购物车中没有数据
         if(list.isEmpty()){
             //根据添加购物车的模式，进行添加订单
@@ -152,7 +154,6 @@ public class OrderController {
 //                return R.fail("包含已下架商品");
 //            }
 //            //进行判断货物是否有货
-            Map<Long, Integer> cartVoListMap = cartVoList.stream().collect(Collectors.toMap(CartVo::getSkuId, CartVo::getCount));
 //            List<GoodsSkus> collect1 = goodsSkulist.stream().filter(s -> s.getSkuInventory() < cartVoListMap.get(s.getSkuId())).collect(Collectors.toList());
 //            if(!ObjectUtils.isEmpty(collect1)){
 //                return R.fail("库存不足");
@@ -267,6 +268,13 @@ public class OrderController {
                 .updateTime(LocalDateTime.now())
                 .build();
         CompletableFuture.runAsync(()->{
+            //减库存
+            cartVoListMap.forEach((k,v)->{
+                goodsSkuService.update(new LambdaUpdateWrapper<GoodsSkus>()
+                        .setSql("sku_inventory = sku_inventory - " + v)
+                        .eq(GoodsSkus::getSkuId, k)
+                );
+            });
             orderProduce.sendOver(order.getId());
         });
         orderInfoService.save(build);
@@ -521,7 +529,11 @@ public class OrderController {
                 .build());
     }
 
-
+    /**
+     *
+     * @param id 订单id
+     * @return
+     */
     public R<Boolean> UpdateOrderStatus(Long id){
         boolean update = orderInfoService.update(new LambdaUpdateWrapper<OrderInfo>()
                 .eq(OrderInfo::getOrderId, id)
@@ -529,7 +541,25 @@ public class OrderController {
                 .set(OrderInfo::getOrderState, 6)
                 .set(OrderInfo::getCountdown, -1)
                 .set(OrderInfo::getCancelReason,"订单超时")
+                .set(OrderInfo::getUpdateTime, LocalDateTime.now())
         );
+        CompletableFuture.runAsync(()->{
+//            修复库存
+            OrderInfo byId = orderInfoService.getById(id);
+            List<OrderSku> orderSkus = orderSkuService.listByIds(byId.getSkusId());
+            Map<Long, Integer> collect1 = orderSkus.stream().collect(Collectors.toMap(OrderSku::getSkuId, OrderSku::getQuantity));
+            List<Long> collect = orderSkus.stream().map(OrderSku::getSkuId).collect(Collectors.toList());
+            //批量还原库存
+            List<GoodsSkus> list = goodsSkusService.list(new LambdaQueryWrapper<GoodsSkus>()
+                    .in(GoodsSkus::getSkuId, collect));
+            list.stream().map(goodsSkus -> {
+                // 获取当前skuId对应的增量值（安全处理null值）
+                Integer count = collect1.get(goodsSkus.getSkuId());
+                goodsSkus.setSkuInventory(goodsSkus.getSkuInventory()+count);
+                return  goodsSkus;
+            });
+            goodsSkusService.updateBatchById(list);
+        });
         return R.ok(update);
     }
 }

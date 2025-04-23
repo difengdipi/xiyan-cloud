@@ -1,8 +1,8 @@
 package com.ruoyi.dental.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ruoyi.dental.domain.Dto.AdminUserAppinfoDto;
 import com.ruoyi.dental.domain.UserAppInfo;
+import com.ruoyi.dental.domain.dto.AdminUserAppinfoDto;
 import com.ruoyi.dental.domain.vo.AppDetailVo;
 import com.ruoyi.dental.domain.vo.AppNumVo;
 import com.ruoyi.dental.domain.vo.UserAppInfoDto;

@@ -16,21 +16,61 @@
         <result property="updatedTime"    column="updated_time"    />
     </resultMap>
 
+    <resultMap type="com.ruoyi.dental.domain.vo.TreatmentPlansVo" id="TreatmentPlansVoResult">
+        <result property="planId"    column="plan_id"    />
+        <result property="patientId"    column="patient_id"    />
+        <result property="name"    column="user_name"    />
+        <result property="phone"    column="phone_number"    />
+        <result property="userAppId"    column="user_app_id"    />
+        <result property="doctorId"    column="doctor_id"    />
+        <result property="treatmentPicture"    column="treatment_picture"    />
+        <result property="treatmentPlan"    column="treatment_plan"    />
+        <result property="skusId"    column="skus_id"    />
+        <result property="createdTime"    column="created_time"    />
+        <result property="updatedTime"    column="updated_time"    />
+    </resultMap>
+
     <sql id="selectTreatmentPlansVo">
         select plan_id, patient_id, user_app_id, treatment_picture, treatment_plan, created_time, updated_time from tb_treatment_plans
     </sql>
 
-    <select id="selectTreatmentPlansList" parameterType="com.ruoyi.dental.domain.TreatmentPlans" resultMap="TreatmentPlansResult">
-        <include refid="selectTreatmentPlansVo"/>
+    <sql id="selectTreatmentPlansDto">
+        select
+            bplans.plan_id,
+            bplans.patient_id,
+            bplans.user_app_id,
+            bplans.treatment_picture,
+            bplans.treatment_plan,
+            bplans.created_time,
+            bplans.updated_time from tb_treatment_plans
+    </sql>
+
+    <select id="selectTreatmentPlansList" parameterType="com.ruoyi.dental.domain.TreatmentPlans" resultMap="TreatmentPlansVoResult">
+        select
+            bplans.plan_id,
+            bplans.patient_id,
+            bplans.user_app_id,
+            bplans.treatment_picture,
+            bplans.treatment_plan,
+            tbp.user_name ,
+            tbp.phone_number ,
+            bplans.created_time,
+            bplans.updated_time from tb_treatment_plans as bplans
+            left join tb_doctors as tbd on bplans.doctor_id = tbd.id
+            left join tb_patients as tbp on bplans.patient_id = tbp.patient_id
         <where>
-            <if test="patientId != null "> and patient_id = #{patientId}</if>
-            <if test="userAppId != null "> and user_app_id = #{userAppId}</if>
-            <if test="doctorId != null "> and doctor_id = #{doctorId}</if>
-            <if test="treatmentPicture != null  and treatmentPicture != ''"> and treatment_picture = #{treatmentPicture}</if>
-            <if test="treatmentPlan != null  and treatmentPlan != ''"> and treatment_plan = #{treatmentPlan}</if>
-            <if test="createdTime != null "> and created_time = #{createdTime}</if>
-            <if test="updatedTime != null "> and updated_time = #{updatedTime}</if>
+            <if test="patientId != null "> and bplans.patient_id = #{patientId}</if>
+            <if test="name != null and name != ''"> and tbp.user_name like concat('%',#{name},'%')</if>
+            <if test="phone != null and phone != ''"> and tbp.phone_number like concat('%',#{phone},'%')</if>
+            <if test="userAppId != null "> and bplans.user_app_id = #{userAppId}</if>
+            <if test="doctorId != null "> and bplans.doctor_id = #{doctorId}</if>
+            <if test="treatmentPicture != null  and treatmentPicture != ''"> and bplans.treatment_picture = #{treatmentPicture}</if>
+            <if test="treatmentPlan != null  and treatmentPlan != ''"> and bplans.treatment_plan = #{treatmentPlan}</if>
+            <if test="createdTime != null "> and bplans.created_time = #{createdTime}</if>
+            <if test="updatedTime != null "> and bplans.updated_time = #{updatedTime}</if>
+            ${params.dataScope}
         </where>
+
     </select>
 
     <select id="selectTreatmentPlansByPlanId" parameterType="Long" resultMap="TreatmentPlansResult">
@@ -43,7 +83,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="patientId != null">patient_id,</if>
             <if test="userAppId != null">user_app_id,</if>
-            <if test="doctorId != null "> and doctor_id </if>
+            <if test="doctorId != null ">doctor_id,</if>
             <if test="treatmentPicture != null">treatment_picture,</if>
             <if test="treatmentPlan != null and treatmentPlan != ''">treatment_plan,</if>
             <if test="skusId != null">skus_id,</if>
@@ -53,8 +93,8 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="patientId != null">#{patientId},</if>
             <if test="userAppId != null">#{userAppId},</if>
-            <if test="treatmentPicture != null">#{treatmentPicture},</if>
             <if test="doctorId != null "> #{doctorId},</if>
+            <if test="treatmentPicture != null">#{treatmentPicture},</if>
             <if test="treatmentPlan != null and treatmentPlan != ''">#{treatmentPlan},</if>
             <if test="skusId != null">#{skusId},</if>
             <if test="createdTime != null">#{createdTime},</if>

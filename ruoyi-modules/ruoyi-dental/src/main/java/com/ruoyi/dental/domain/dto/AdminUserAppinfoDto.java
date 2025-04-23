@@ -1,4 +1,4 @@
-package com.ruoyi.dental.domain.Dto;
+package com.ruoyi.dental.domain.dto;
 
 import lombok.Data;
 

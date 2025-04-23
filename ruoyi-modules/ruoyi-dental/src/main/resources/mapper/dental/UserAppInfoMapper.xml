@@ -118,7 +118,7 @@
         <include refid="selectUserAppInfoVo"/>
         where id = #{id}
     </select>
-    <select id="listschedule" resultType="com.ruoyi.dental.domain.Dto.AdminUserAppinfoDto">
+    <select id="listschedule" resultType="com.ruoyi.dental.domain.dto.AdminUserAppinfoDto">
         SELECT
             count( 1 ) AS
         VALUE

@@ -10,6 +10,7 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.common.security.service.TokenService;
 import com.ruoyi.dental.domain.TreatmentPlans;
+import com.ruoyi.dental.domain.vo.TreatmentPlansVo;
 import com.ruoyi.dental.service.ITreatmentPlansService;
 import com.ruoyi.system.api.domain.SysUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,15 +37,16 @@ public class TreatmentPlansController extends BaseController
     private ITreatmentPlansService treatmentPlansService;
     @Autowired
     TokenService tokenService;
+
     /**
      * 查询治疗计划列表
      */
     @RequiresPermissions("dental:plans:list")
     @GetMapping("/list")
-    public TableDataInfo list(TreatmentPlans treatmentPlans)
+    public TableDataInfo list(TreatmentPlansVo treatmentPlans)
     {
         startPage();
-        List<TreatmentPlans> list = treatmentPlansService.selectTreatmentPlansList(treatmentPlans);
+        List<TreatmentPlansVo> list = treatmentPlansService.selectTreatmentPlansList(treatmentPlans);
         return getDataTable(list);
     }
 
@@ -53,10 +56,10 @@ public class TreatmentPlansController extends BaseController
     @RequiresPermissions("dental:plans:export")
     @Log(title = "治疗计划", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, TreatmentPlans treatmentPlans)
+    public void export(HttpServletResponse response, TreatmentPlansVo treatmentPlans)
     {
-        List<TreatmentPlans> list = treatmentPlansService.selectTreatmentPlansList(treatmentPlans);
-        ExcelUtil<TreatmentPlans> util = new ExcelUtil<TreatmentPlans>(TreatmentPlans.class);
+        List<TreatmentPlansVo> list = treatmentPlansService.selectTreatmentPlansList(treatmentPlans);
+        ExcelUtil<TreatmentPlansVo> util = new ExcelUtil<>(TreatmentPlansVo.class);
         util.exportExcel(response, list, "治疗计划数据");
     }
 
@@ -78,7 +81,7 @@ public class TreatmentPlansController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody TreatmentPlans treatmentPlans)
     {
-
+        treatmentPlans.setCreatedTime(new Date());
         return toAjax(treatmentPlansService.insertTreatmentPlans(treatmentPlans));
     }
 
@@ -92,6 +95,7 @@ public class TreatmentPlansController extends BaseController
     {
         SysUser sysUser = tokenService.getLoginUser().getSysUser();
         treatmentPlans.setDoctorId(sysUser.getUserId());
+        treatmentPlans.setUpdatedTime(new Date());
         return toAjax(treatmentPlansService.updateTreatmentPlans(treatmentPlans));
     }
 
@@ -109,9 +113,9 @@ public class TreatmentPlansController extends BaseController
     @Operation(summary ="根据预约id获取预约结果")
     public R getData(@PathVariable("id")Long id){
         //根据预约id获取预约结果
-        TreatmentPlans treatmentPlans = new TreatmentPlans();
+        TreatmentPlansVo treatmentPlans = new TreatmentPlansVo();
         treatmentPlans.setUserAppId(id);
-        List<TreatmentPlans> list = treatmentPlansService.selectTreatmentPlansList(treatmentPlans);
+        List<TreatmentPlansVo> list = treatmentPlansService.selectTreatmentPlansList(treatmentPlans);
         return R.ok(list);
     }
 }

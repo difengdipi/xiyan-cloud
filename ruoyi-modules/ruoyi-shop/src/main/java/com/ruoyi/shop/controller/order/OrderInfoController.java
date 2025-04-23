@@ -82,13 +82,7 @@ public class OrderInfoController extends BaseController
     public void export(HttpServletResponse response, OrderInfo orderInfo)
     {
         ExcelUtil<OrderInfo> util = new ExcelUtil<OrderInfo>(OrderInfo.class);
-        List<OrderInfo> list = null;
-        if(redisService.hasKey(CACHE_PREFIX)){
-            list = redisService.getCacheList(CACHE_PREFIX);
-            util.exportExcel(response, list, "订单管理数据");
-        }else {
-            list = orderInfoService.selectOrderInfoList(orderInfo);
-        }
+        List<OrderInfo> list = orderInfoService.selectOrderInfoList(orderInfo);
         util.exportExcel(response, list, "订单管理数据");
     }
 

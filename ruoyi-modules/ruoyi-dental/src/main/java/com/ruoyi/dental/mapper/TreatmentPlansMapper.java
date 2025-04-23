@@ -1,6 +1,7 @@
 package com.ruoyi.dental.mapper;
 
 import com.ruoyi.dental.domain.TreatmentPlans;
+import com.ruoyi.dental.domain.vo.TreatmentPlansVo;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public interface TreatmentPlansMapper
      * @param treatmentPlans 治疗计划
      * @return 治疗计划集合
      */
-    public List<TreatmentPlans> selectTreatmentPlansList(TreatmentPlans treatmentPlans);
+    public List<TreatmentPlansVo> selectTreatmentPlansList(TreatmentPlansVo treatmentPlans);
 
     /**
      * 新增治疗计划

@@ -1,9 +1,11 @@
 package com.ruoyi.dental.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ruoyi.common.core.annotation.Excel;
 import com.ruoyi.common.core.web.domain.BaseEntity;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -14,6 +16,7 @@ import java.util.Date;
  * @date 2025-04-10
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TreatmentPlans extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -30,6 +33,7 @@ public class TreatmentPlans extends BaseEntity
     @Excel(name = "预约号")
     private Long userAppId;
     @Excel(name = "治疗医生id")
+    @JsonProperty("doctorId")
     private Long doctorId;
 
     /** 病例图片 */
@@ -41,13 +45,13 @@ public class TreatmentPlans extends BaseEntity
     private String treatmentPlan;
 
     /** 创建时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "创建时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "创建时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date createdTime;
 
     /** 更新时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "更新时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "更新时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
 
     public void setPlanId(Long planId) 

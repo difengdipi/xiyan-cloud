@@ -1,8 +1,10 @@
 package com.ruoyi.dental.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ruoyi.common.datascope.annotation.DataScope;
 import com.ruoyi.dental.domain.TreatmentPlans;
 import com.ruoyi.dental.domain.UserAppInfo;
+import com.ruoyi.dental.domain.vo.TreatmentPlansVo;
 import com.ruoyi.dental.mapper.TreatmentPlansMapper;
 import com.ruoyi.dental.service.ITreatmentPlansService;
 import com.ruoyi.dental.service.IUserAppInfoService;
@@ -49,7 +51,8 @@ public class TreatmentPlansServiceImpl implements ITreatmentPlansService
      * @return 治疗计划
      */
     @Override
-    public List<TreatmentPlans> selectTreatmentPlansList(TreatmentPlans treatmentPlans)
+    @DataScope(deptAlias = "tbd", userAlias = "tbd")
+    public List<TreatmentPlansVo> selectTreatmentPlansList(TreatmentPlansVo treatmentPlans)
     {
         return treatmentPlansMapper.selectTreatmentPlansList(treatmentPlans);
     }
@@ -60,10 +63,14 @@ public class TreatmentPlansServiceImpl implements ITreatmentPlansService
      * @param treatmentPlans 治疗计划
      * @return 结果
      */
+
     @Override
     public int insertTreatmentPlans(TreatmentPlans treatmentPlans)
     {
+        //获取医生id
+        UserAppInfo byId = userAppInfoService.getById(treatmentPlans.getUserAppId());
         treatmentPlans.setCreatedTime(new Date());
+        treatmentPlans.setDoctorId(byId.getDoctorId());
         //新增完治疗计划将用户前端状态码改为:已完成
         CompletableFuture.runAsync(()->{
             LambdaUpdateWrapper<UserAppInfo> eq = new LambdaUpdateWrapper<UserAppInfo>()

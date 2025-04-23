@@ -12,9 +12,9 @@ import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.Util.DentalUtils;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.dental.domain.DoctorSchedules;
-import com.ruoyi.dental.domain.Dto.AdminUserAppinfoDto;
 import com.ruoyi.dental.domain.Patients;
 import com.ruoyi.dental.domain.UserAppInfo;
+import com.ruoyi.dental.domain.dto.AdminUserAppinfoDto;
 import com.ruoyi.dental.domain.vo.AppDetailReasonDto;
 import com.ruoyi.dental.domain.vo.AppDetailVo;
 import com.ruoyi.dental.domain.vo.UserAppInfoDto;
@@ -205,6 +205,15 @@ public class UserAppInfoController extends BaseController {
                 .set(UserAppInfo::getCancelReason, dto.getReason())
                 .set(UserAppInfo::getStatus, 2)
         );
+        CompletableFuture.runAsync(()-> {
+            UserAppInfo byId = userAppInfoService.getById(id);
+            //用户取消预约后，需释放出当前用户的预约
+            doctorSchedulesService.update(
+                    new LambdaUpdateWrapper<DoctorSchedules>()
+                            .eq(DoctorSchedules::getId, byId.getScheduleId())
+                            .setSql("app_num = app_num + 1")
+            );
+        });
         return update? R.ok("取消成功") : R.fail("取消失败");
     }
 
