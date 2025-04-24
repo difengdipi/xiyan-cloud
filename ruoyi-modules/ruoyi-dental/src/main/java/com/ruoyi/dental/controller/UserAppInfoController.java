@@ -23,6 +23,7 @@ import com.ruoyi.dental.service.IPatientsService;
 import com.ruoyi.dental.service.IUserAppInfoService;
 import com.ruoyi.dental.utils.SensiUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequestMapping("/UserAppInfo")
 @Slf4j
+@Tag(name = "用户预约医生")
 public class UserAppInfoController extends BaseController {
     @Autowired
     IUserAppInfoService userAppInfoService;
