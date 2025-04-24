@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.bean.BeanUtils;
+import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.core.web.page.TableDataInfo;
 import com.ruoyi.shop.config.Utils;
 import com.ruoyi.shop.controller.address.AddressController;
 import com.ruoyi.shop.domain.goods.*;
@@ -24,7 +27,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/goods")
 @Tag(name = "显示商品")
-public class GoodsController {
+public class GoodsController extends BaseController {
     @Autowired
     private GoodsService goodsService;
     @Autowired
@@ -34,9 +37,26 @@ public class GoodsController {
 
     @Operation(summary = "获得所有的商品")
     @GetMapping(value = "/getAllGoods")
-    public R getAllGoods() {
-        List<Goods> goods = goodsService.list();
-        return R.ok(goods);
+    public TableDataInfo getAllGoods(Goods goods) {
+        //添加分页查询
+        startPage();
+        LambdaQueryWrapper<Goods> goodsWrapper = new LambdaQueryWrapper<>();
+        if(!StringUtils.isEmpty(goods.getGoodsName())){
+            goodsWrapper.like(Goods::getGoodsName, goods.getGoodsName());
+        }
+        if(!StringUtils.isEmpty(goods.getGoodsDesc())){
+            goodsWrapper.like(Goods::getGoodsDesc, goods.getGoodsDesc());
+        }
+        if(goods.getGoodsPrice() != null){
+            goodsWrapper.eq(Goods::getGoodsDesc, goods.getGoodsDesc());
+        }
+        if(goods.getGoodsOrdernum() != null){
+            goodsWrapper.eq(Goods::getGoodsOrdernum, goods.getGoodsOrdernum());
+        }
+        List<Goods> list = goodsService.list(
+                goodsWrapper
+        );
+        return getDataTable(list);
     }
 
     @Operation(summary = "猜你喜欢商品带分页")

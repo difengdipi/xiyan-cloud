@@ -36,7 +36,7 @@ public class PatientsController extends BaseController
      */
     @RequiresPermissions("dental:patients:list")
     @GetMapping("/list")
-    @Operation(tags = "查询患者列表列表")
+    @Operation(summary = "查询患者列表列表")
     public TableDataInfo list(Patients patients)
     {
         startPage();
@@ -48,7 +48,7 @@ public class PatientsController extends BaseController
      * 导出患者列表列表
      */
     @RequiresPermissions("dental:patients:export")
-    @Operation(tags = "导出患者列表列表")
+    @Operation(summary = "导出患者列表列表")
     @Log(title = "患者列表", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, Patients patients)
@@ -63,7 +63,7 @@ public class PatientsController extends BaseController
      */
     @RequiresPermissions("dental:patients:query")
     @GetMapping(value = "/{patientId}")
-    @Operation(tags = "获取患者列表详细信息")
+    @Operation(summary = "获取患者列表详细信息")
     public AjaxResult getInfo(@PathVariable("patientId") Long patientId)
     {
         return success(patientsService.selectPatientsByPatientId(patientId));
@@ -73,7 +73,7 @@ public class PatientsController extends BaseController
      * 新增患者列表
      */
     @RequiresPermissions("dental:patients:add")
-    @Operation(tags = "新增患者列表")
+    @Operation(summary = "新增患者列表")
     @Log(title = "患者列表", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody Patients patients)
@@ -87,7 +87,7 @@ public class PatientsController extends BaseController
     @RequiresPermissions("dental:patients:edit")
     @Log(title = "患者列表", businessType = BusinessType.UPDATE)
     @PutMapping
-    @Operation(tags = "修改患者列表")
+    @Operation(summary = "修改患者列表")
     public AjaxResult edit(@RequestBody Patients patients)
     {
         return toAjax(patientsService.updatePatients(patients));
@@ -98,7 +98,7 @@ public class PatientsController extends BaseController
      */
     @RequiresPermissions("dental:patients:remove")
     @Log(title = "患者列表", businessType = BusinessType.DELETE)
-    @Operation(tags = "删除患者列表")
+    @Operation(summary = "删除患者列表")
 	@DeleteMapping("/{patientIds}")
     public AjaxResult remove(@PathVariable Long[] patientIds)
     {

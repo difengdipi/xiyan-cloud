@@ -1,6 +1,10 @@
 package com.ruoyi.shop.controller.banner;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.utils.StringUtils;
+import com.ruoyi.common.core.web.controller.BaseController;
+import com.ruoyi.common.core.web.page.TableDataInfo;
 import com.ruoyi.common.redis.service.RedisService;
 import com.ruoyi.shop.domain.Banner.Banner;
 import com.ruoyi.shop.service.banner.BannerService;
@@ -22,7 +26,7 @@ import java.util.Random;
 @RequestMapping(value = "/home/banner/")
 @Tag(name = "显示banner")
 @Slf4j
-public class BannerController {
+public class BannerController extends BaseController {
 
     @PostConstruct
     public void init(){
@@ -68,6 +72,24 @@ public class BannerController {
         }
         redisService.setCacheObject(redisKey, banners);
         return R.ok( banners);
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "轮播图带分页")
+    public TableDataInfo list(Banner banner){
+        startPage();
+        LambdaQueryWrapper<Banner> queryWrapper = new LambdaQueryWrapper<>();
+        if(StringUtils.isNotEmpty(banner.getHrefUrl())){
+            queryWrapper.like(Banner::getHrefUrl, banner.getHrefUrl());
+            List<Banner> list = bannerService.list(queryWrapper);
+            return getDataTable(list);
+        }
+        if(redisService.hasKey(redisKey)){
+            return getDataTable(redisService.getCacheObject(redisKey));
+        }
+        List<Banner> banners = bannerService.list();
+        redisService.setCacheObject(redisKey, banners);
+        return getDataTable(banners);
     }
 
     @Operation(summary = "增加轮播图")
