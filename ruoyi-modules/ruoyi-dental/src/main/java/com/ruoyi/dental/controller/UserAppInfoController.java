@@ -11,10 +11,12 @@ import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.Util.DentalUtils;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
+import com.ruoyi.dental.component.RabbitProduce;
 import com.ruoyi.dental.domain.DoctorSchedules;
 import com.ruoyi.dental.domain.Patients;
 import com.ruoyi.dental.domain.UserAppInfo;
 import com.ruoyi.dental.domain.dto.AdminUserAppinfoDto;
+import com.ruoyi.dental.domain.dto.DoctorNumsDto;
 import com.ruoyi.dental.domain.vo.AppDetailReasonDto;
 import com.ruoyi.dental.domain.vo.AppDetailVo;
 import com.ruoyi.dental.domain.vo.UserAppInfoDto;
@@ -50,6 +52,8 @@ import java.util.concurrent.CompletableFuture;
 public class UserAppInfoController extends BaseController {
     @Autowired
     IUserAppInfoService userAppInfoService;
+    @Autowired
+    RabbitProduce rabbitProduce;
     @Resource
     IPatientsService patientsService;
     @Autowired
@@ -129,6 +133,7 @@ public class UserAppInfoController extends BaseController {
                     .eq(DoctorSchedules::getId, appUserInfo.getScheduleId())
                     .set(DoctorSchedules::getAppNum, doctorSchedulesService.getById(appUserInfo.getScheduleId()).getAppNum()+1)
             );
+
             //同时创建患者--需要判断患者是否存在
             if(appUserInfo.getPhone() != null){
                 Patients one = patientsService.getOne(new LambdaQueryWrapper<Patients>()
@@ -154,6 +159,11 @@ public class UserAppInfoController extends BaseController {
                     userAppInfoService.update(wrapper);
                 }
             }
+
+            rabbitProduce.sendOver( DoctorNumsDto.builder()
+                    .id(appUserInfo.getDoctorId())
+                    .fun(DoctorNumsDto.type.add)
+                    .build());
         }).whenCompleteAsync((v,e)->{
             if (e != null) {
                 log.error("异步调用失败", e);
@@ -213,8 +223,14 @@ public class UserAppInfoController extends BaseController {
             doctorSchedulesService.update(
                     new LambdaUpdateWrapper<DoctorSchedules>()
                             .eq(DoctorSchedules::getId, byId.getScheduleId())
-                            .setSql("app_num = app_num + 1")
+                            .setSql("max_num = max_num")
+                            .setSql("app_num = app_num - 1")
+
             );
+            rabbitProduce.sendOver( DoctorNumsDto.builder()
+                    .id(byId.getDoctorId())
+                    .fun(DoctorNumsDto.type.cancel)
+                    .build());
         });
         return update? R.ok("取消成功") : R.fail("取消失败");
     }

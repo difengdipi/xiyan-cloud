@@ -1,6 +1,7 @@
 package com.ruoyi.dental.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.web.controller.BaseController;
@@ -13,6 +14,7 @@ import com.ruoyi.common.security.annotation.RequiresPermissions;
 import com.ruoyi.dental.domain.DoctorSchedules;
 import com.ruoyi.dental.domain.Doctors;
 import com.ruoyi.dental.domain.UserAppInfo;
+import com.ruoyi.dental.domain.dto.DoctorNumsDto;
 import com.ruoyi.dental.service.IDoctorSchedulesService;
 import com.ruoyi.dental.service.IDoctorsService;
 import com.ruoyi.dental.service.IUserAppInfoService;
@@ -214,4 +216,18 @@ public class DoctorsController extends BaseController
         return R.ok(doctors);
     }
 
+
+    @Operation(summary = "更新预约人数")
+    public R updateAppNum(DoctorNumsDto dto){
+        DoctorNumsDto.type fun = dto.getFun();
+        LambdaUpdateWrapper<Doctors> LambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        if(fun.equals(DoctorNumsDto.type.add)){
+            LambdaUpdateWrapper.setSql("app_num = app_num + 1");
+        }
+        if(fun.equals(DoctorNumsDto.type.cancel)){
+            LambdaUpdateWrapper.setSql("app_num = app_num - 1");
+        }
+        boolean update = doctorsService.update(LambdaUpdateWrapper);
+        return R.ok(update);
+    }
 }
