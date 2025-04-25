@@ -1,6 +1,6 @@
 package com.ruoyi.system.api.factory;
 
-import com.ruoyi.system.api.RemoteWxService;
+import com.ruoyi.system.api.payApi.RemoteWxService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;

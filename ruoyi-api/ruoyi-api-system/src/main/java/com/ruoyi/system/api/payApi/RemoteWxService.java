@@ -1,4 +1,4 @@
-package com.ruoyi.system.api;
+package com.ruoyi.system.api.payApi;
 
 import com.ruoyi.system.api.factory.RemoteWxFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;

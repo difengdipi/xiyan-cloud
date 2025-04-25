@@ -3,7 +3,7 @@ package com.ruoyi.auth.config;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.auth.pojos.WxAccessToken;
 import com.ruoyi.common.redis.service.RedisService;
-import com.ruoyi.system.api.RemoteWxService;
+import com.ruoyi.system.api.payApi.RemoteWxService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;

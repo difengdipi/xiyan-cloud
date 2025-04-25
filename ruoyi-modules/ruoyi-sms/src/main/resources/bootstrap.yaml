@@ -1,7 +1,6 @@
 # Tomcat
 server:
   port: 9218
-
 # Spring
 spring:
   application:
