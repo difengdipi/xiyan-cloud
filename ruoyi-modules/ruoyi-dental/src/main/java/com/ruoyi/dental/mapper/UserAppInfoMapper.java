@@ -72,4 +72,5 @@ public interface UserAppInfoMapper extends BaseMapper<UserAppInfo> {
 
     List<AdminUserAppinfoDto> listschedule();
 
+    List<UserAppInfoDto> list(UserAppInfoDto userAppInfo);
 }

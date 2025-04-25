@@ -10,6 +10,9 @@ import org.springframework.amqp.rabbit.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.util.List;
+
 /**
  * @Description:
  * @author: zh
@@ -29,15 +32,26 @@ public class RabbitConsume {
                                     exchange = @Exchange(value = RabbitConfig.USER_APP_EXCHANGE), key = RabbitConfig.USER_APP_ROUTING)
                     })
     @RabbitHandler
-    public void processOrder(Message massage, Channel channel) {
-        DoctorNumsDto dto = JSON.parseObject(new String(massage.getBody()), DoctorNumsDto.class);
-        if (null == dto) {
-            return;
-        }
-        try {
+    public void processOrder(Message message, Channel channel) {
+        try{
 //            手动确认机制
-            doctorsController.updateAppNum(dto);
+            List<DoctorNumsDto> dto = JSON.parseArray(new String(message.getBody()), DoctorNumsDto.class);
+            if (dto == null) {
+                // 消息处理失败，拒绝消息
+                channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
+                return;
+            }
+            // 手动确认机制
+            doctorsController.updateAppList(dto);
+            // 消息处理成功，确认消息
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
+            // 消息处理失败，拒绝消息
+            try {
+                channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }

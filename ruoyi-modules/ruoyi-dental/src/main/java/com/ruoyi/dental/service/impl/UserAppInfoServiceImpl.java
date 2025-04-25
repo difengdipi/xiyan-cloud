@@ -109,6 +109,11 @@ public class UserAppInfoServiceImpl extends ServiceImpl<UserAppInfoMapper, UserA
     }
 
     @Override
+    public List<UserAppInfoDto> selectList(UserAppInfoDto userAppInfo) {
+        return userAppInfoMapper.list(userAppInfo);
+    }
+
+    @Override
     public List<AppNumVo> getDoctorAppNum() {
         return userAppInfoMapper.getDoctorAppNum();
     }

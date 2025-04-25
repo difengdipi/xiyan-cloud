@@ -235,7 +235,6 @@ public class DoctorSchedulesController extends BaseController
     @Operation(summary = "删除医生行程")
     public AjaxResult remove(@PathVariable("ids") Long[] ids,@RequestParam(required = true, defaultValue = "店铺容量满，请到店挂号")String reason)
     {
-
         return toAjax(doctorSchedulesService.deleteDoctorSchedulesByIds(ids,reason));
     }
     @GetMapping("/all")

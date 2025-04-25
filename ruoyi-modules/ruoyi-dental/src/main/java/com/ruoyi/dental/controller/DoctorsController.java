@@ -142,7 +142,7 @@ public class DoctorsController extends BaseController
     public R getDockersInfo(){
         //小程序端获取今日在线医生，需要获取的是今日或者未来行程安排中拥有的而不是全部渲染
         List<Doctors> list = doctorsService.list(new LambdaQueryWrapper<Doctors>()
-                .eq(Doctors::getStatus,1)
+                .in(Doctors::getStatus,1,3)
         );
         //判断当前时间是否超过18:00，超过则不显示
         LocalDate today = LocalDate.now();
@@ -157,7 +157,7 @@ public class DoctorsController extends BaseController
         );
         //获取行程表中去重后的医生id
         Set<Long> collect = schedulesList.stream().map(DoctorSchedules::getDoctorId).collect(Collectors.toSet());
-        //根据去重后的医生id获取医生信息
+        //根据去重后的医生id获取医生信息 
         List<Doctors> collect1 = list.stream().filter(doctors -> collect.contains(doctors.getId())).collect(Collectors.toList());
         return  R.ok(collect1);
     }
@@ -218,16 +218,20 @@ public class DoctorsController extends BaseController
 
 
     @Operation(summary = "更新预约人数")
-    public R updateAppNum(DoctorNumsDto dto){
-        DoctorNumsDto.type fun = dto.getFun();
-        LambdaUpdateWrapper<Doctors> LambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        if(fun.equals(DoctorNumsDto.type.add)){
-            LambdaUpdateWrapper.setSql("app_num = app_num + 1");
-        }
-        if(fun.equals(DoctorNumsDto.type.cancel)){
-            LambdaUpdateWrapper.setSql("app_num = app_num - 1");
-        }
-        boolean update = doctorsService.update(LambdaUpdateWrapper);
-        return R.ok(update);
+    public R updateAppList(List<DoctorNumsDto> dto){
+        dto.stream().map(tmp -> {
+            DoctorNumsDto.type fun = tmp.getFun();
+            LambdaUpdateWrapper<Doctors> LambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            if(fun.equals(DoctorNumsDto.type.add)){
+                LambdaUpdateWrapper.setSql("app_num = app_num + 1");
+            }
+            if(fun.equals(DoctorNumsDto.type.cancel)){
+                LambdaUpdateWrapper.setSql("app_num = app_num - 1");
+            }
+            boolean update = doctorsService.update(LambdaUpdateWrapper);
+            return update;
+        });
+
+        return R.ok();
     }
 }

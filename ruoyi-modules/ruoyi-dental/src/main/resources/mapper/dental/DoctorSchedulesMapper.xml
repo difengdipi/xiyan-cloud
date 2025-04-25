@@ -60,7 +60,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <select id="selectDoctorSchedulesById" parameterType="Long" resultMap="DoctorSchedulesVoResult">
         <include refid="selectDoctorSchedulesVo"/>
-        where sc.doctor_id= #{id}
+        where sc.id= #{id}
     </select>
 
     <insert id="insertDoctorSchedules" parameterType="com.ruoyi.dental.domain.DoctorSchedules">

@@ -73,4 +73,5 @@ public interface IUserAppInfoService extends IService<UserAppInfo> {
 
     List<AdminUserAppinfoDto> listschedule();
 
+    List<UserAppInfoDto> selectList(UserAppInfoDto userAppInfo);
 }

@@ -1,10 +1,13 @@
 package com.ruoyi.dental.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.datascope.annotation.DataScope;
+import com.ruoyi.dental.component.RabbitProduce;
 import com.ruoyi.dental.domain.DoctorSchedules;
 import com.ruoyi.dental.domain.UserAppInfo;
+import com.ruoyi.dental.domain.dto.DoctorNumsDto;
 import com.ruoyi.dental.domain.vo.DoctorSchedulesVo;
 import com.ruoyi.dental.mapper.DoctorSchedulesMapper;
 import com.ruoyi.dental.mapper.UserAppInfoMapper;
@@ -17,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * 医生行程Service业务层处理
@@ -91,6 +95,8 @@ public class DoctorSchedulesServiceImpl extends ServiceImpl<DoctorSchedulesMappe
      */
     @Autowired
     UserAppInfoMapper userAppInfoMapper;
+    @Autowired
+    RabbitProduce rabbitProduce;
     @Override
     public int deleteDoctorSchedulesByIds(Long[] ids, String reason)
     {
@@ -100,11 +106,21 @@ public class DoctorSchedulesServiceImpl extends ServiceImpl<DoctorSchedulesMappe
                 .set(DoctorSchedules::getStatus,0);
         //取消对应的用户预约
         CompletableFuture.supplyAsync(()->{
+
             int update = userAppInfoMapper.update(new LambdaUpdateWrapper<UserAppInfo>()
                     .in(UserAppInfo::getScheduleId, ids)
                     .set(UserAppInfo::getStatus, 2)
                     .set(UserAppInfo::getCancelReason, reason)
             );
+            //通过行程id获取对应的医生id
+            List<DoctorSchedules> doctorSchedules = list(new LambdaQueryWrapper<DoctorSchedules>()
+                    .in(DoctorSchedules::getId, ids)
+            );
+            List<DoctorNumsDto> dto = doctorSchedules.stream().map(doctorSchedules1 -> DoctorNumsDto.builder()
+                    .id(doctorSchedules1.getDoctorId())
+                    .fun(DoctorNumsDto.type.cancel)
+                    .build()).collect(Collectors.toList());
+            rabbitProduce.sendOver(dto);
             return update;
         }).whenCompleteAsync((a,b)-> {
             if(a <= 0){

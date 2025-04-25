@@ -160,10 +160,10 @@ public class UserAppInfoController extends BaseController {
                 }
             }
 
-            rabbitProduce.sendOver( DoctorNumsDto.builder()
+            rabbitProduce.sendOver(Arrays.asList(DoctorNumsDto.builder()
                     .id(appUserInfo.getDoctorId())
                     .fun(DoctorNumsDto.type.add)
-                    .build());
+                    .build()));
         }).whenCompleteAsync((v,e)->{
             if (e != null) {
                 log.error("异步调用失败", e);
@@ -227,10 +227,10 @@ public class UserAppInfoController extends BaseController {
                             .setSql("app_num = app_num - 1")
 
             );
-            rabbitProduce.sendOver( DoctorNumsDto.builder()
+            rabbitProduce.sendOver(Arrays.asList(DoctorNumsDto.builder()
                     .id(byId.getDoctorId())
                     .fun(DoctorNumsDto.type.cancel)
-                    .build());
+                    .build()));
         });
         return update? R.ok("取消成功") : R.fail("取消失败");
     }
@@ -336,4 +336,15 @@ public class UserAppInfoController extends BaseController {
         return R.ok(list);
     }
 
+    /**
+     * 查询预约列表
+     */
+    @RequiresPermissions("dental:UserAppInfo:list")
+    @GetMapping("/register/list")
+    public TableDataInfo listRegister(UserAppInfoDto userAppInfo)
+    {
+        startPage();
+        List<UserAppInfoDto> list = userAppInfoService.selectList(userAppInfo);
+        return getDataTable(list);
+    }
 }

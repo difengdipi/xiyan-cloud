@@ -7,6 +7,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * @Description:
  * @author: zh
@@ -26,7 +28,7 @@ public class RabbitProduce {
      *
      * @param dto
      */
-    public void sendOver(DoctorNumsDto dto) {
+    public void sendOver(List<DoctorNumsDto> dto) {
         String mqMessage = JSON.toJSONString(dto);
         try {
             rabbitTemplate.convertAndSend(RabbitConfig.USER_APP_EXCHANGE, RabbitConfig.USER_APP_ROUTING, mqMessage);

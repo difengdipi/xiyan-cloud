@@ -140,6 +140,41 @@
         GROUP BY
         STATUS
     </select>
+    <select id="list" resultType="com.ruoyi.dental.domain.vo.UserAppInfoDto">
+        SELECT
+        uai.id,
+        uai.user_id,  <!-- 移除AS userId -->
+        uai.doctor_id,  <!-- 移除AS doctorId -->
+        td.name AS doctor_name,  <!-- 修改为下划线命名 -->
+        uai.schedule_id,  <!-- 移除AS scheduleId -->
+        tds.date AS schedule_date,  <!-- 修改为下划线命名 -->
+        uai.patient_id,
+        uai.name,
+        uai.status,
+        uai.app_status,
+        uai.phone,
+        uai.idcard,
+        uai.cancel_reason,
+        uai.create_time,
+        uai.update_time
+        FROM
+        tb_user_app_info uai
+        LEFT JOIN tb_doctors td ON uai.doctor_id = td.id
+        LEFT JOIN tb_doctor_schedules tds ON uai.schedule_id = tds.id
+        <where>
+            <if test="userId != null">uai.user_id = #{userId}</if>
+            <if test="scheduleId != null"> AND uai.schedule_id = #{scheduleId}</if>
+            <if test="doctorId != null"> AND uai.doctor_id = #{doctorId}</if>
+            <if test="name != null and name != ''"> AND uai.name LIKE CONCAT('%', #{name}, '%')</if>
+            <if test="doctorName != null and doctorName != ''"> AND td.name LIKE CONCAT('%', #{doctorName}, '%')</if>
+            <if test="status != null"> AND uai.status = #{status}</if>
+            <if test="appStatus != null"> AND uai.app_status = #{appStatus}</if>
+            <if test="phone != null and phone != ''"> AND uai.phone = #{phone}</if>
+            <if test="idcard != null and idcard != ''"> AND uai.idcard = #{idcard}</if>
+            <if test="cancelReason != null and cancelReason != ''"> AND uai.cancel_reason LIKE CONCAT('%', #{cancelReason}, '%')</if>
+            <if test="scheduleDate !=null">  AND DATE(tds.date) = DATE(#{scheduleDate})</if>
+        </where>
+    </select>
 
     <insert id="insertUserAppInfo" parameterType="com.ruoyi.dental.domain.UserAppInfo">
         insert into tb_user_app_info
