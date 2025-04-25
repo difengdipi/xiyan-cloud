@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static com.ruoyi.shop.constants.ShopCacheConstants.ORDER_INFO_KEY;
+
 /**
  * 订单管理Controller
  * 
@@ -48,7 +50,6 @@ public class OrderInfoController extends BaseController
     private OrderInfoIService orderInfoService;
     @Autowired
     private RedisService redisService;
-    private final String CACHE_PREFIX = "orderInfoList";
     /**
      * 查询订单管理列表
      */
@@ -60,7 +61,7 @@ public class OrderInfoController extends BaseController
         startPage();
         List<OrderInfo> list = orderInfoService.selectOrderInfoList(orderInfo);
         if(!list.isEmpty()){
-            redisService.setCacheList(CACHE_PREFIX,list);
+            redisService.setCacheList(ORDER_INFO_KEY,list);
         }
         return getDataTable(list);
     }
@@ -107,7 +108,7 @@ public class OrderInfoController extends BaseController
     public AjaxResult add(@RequestBody OrderInfo orderInfo)
     {
         CompletableFuture.runAsync(() -> {
-            redisService.deleteObject(CACHE_PREFIX);
+            redisService.deleteObject(ORDER_INFO_KEY);
         });
         return toAjax(orderInfoService.insertOrderInfo(orderInfo));
     }
@@ -122,7 +123,7 @@ public class OrderInfoController extends BaseController
     public AjaxResult edit(@RequestBody OrderInfo orderInfo)
     {
         CompletableFuture.runAsync(() -> {
-            redisService.deleteObject(CACHE_PREFIX);
+            redisService.deleteObject(ORDER_INFO_KEY);
         });
         return toAjax(orderInfoService.updateOrderInfo(orderInfo));
     }
@@ -137,7 +138,7 @@ public class OrderInfoController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         CompletableFuture.runAsync(() -> {
-            redisService.deleteObject(CACHE_PREFIX);
+            redisService.deleteObject(ORDER_INFO_KEY);
         });
         return toAjax(orderInfoService.deleteOrderInfoByIds(ids));
     }
@@ -170,7 +171,7 @@ public class OrderInfoController extends BaseController
         log.info("orderInfoList:{}",collect);
         //批量导入数据
         CompletableFuture.runAsync(() -> {
-            redisService.deleteObject(CACHE_PREFIX);
+            redisService.deleteObject(ORDER_INFO_KEY);
         });
         for (OrderInfo orderInfo : collect) {
             LambdaUpdateWrapper<OrderInfo> orderInfoLambdaUpdateWrapper =

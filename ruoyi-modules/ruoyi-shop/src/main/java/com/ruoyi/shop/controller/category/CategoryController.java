@@ -4,6 +4,7 @@ package com.ruoyi.shop.controller.category;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.bean.BeanUtils;
+import com.ruoyi.common.redis.service.RedisService;
 import com.ruoyi.shop.domain.category.Category;
 import com.ruoyi.shop.domain.category.vo.CategoryChildItemVO;
 import com.ruoyi.shop.domain.category.vo.CategoryTopItemVO;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import static com.ruoyi.shop.constants.ShopCacheConstants.CATEGORY_KEY;
 
 @RestController
 @RequestMapping(value = "/category")
@@ -48,11 +52,15 @@ public class CategoryController {
             return R.fail("增加分类失败");
         }
     }
-
+    @Autowired
+    RedisService redisService;
     @Operation(summary = "删除分类数据")
     @DeleteMapping(value = "/deleteCategory/{id}")
     public R deleteCategory(@PathVariable("id") Integer id) {
-        boolean flag = categoryService.removeById(id);
+        boolean flag = categoryService.remove(new LambdaQueryWrapper<Category>().eq(Category::getCategoryId, id));
+        CompletableFuture.runAsync(() -> {
+            redisService.deleteObject(CATEGORY_KEY);
+        });
         if (flag) {
             return R.ok("删除分类成功");
         } else {

@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import static com.ruoyi.shop.constants.ShopCacheConstants.CATEGORY_KEY;
+
 /**
  * @Description: 小程序home分类controller
  * @author: zh
@@ -36,7 +38,6 @@ public class HomeCategoryController {
     private CategoryService categoryService;
     @Autowired
     RedisService redisService;
-    private static final String CATEGORY_KEY = "Home_category";
     @PostConstruct
     public void init(){
         log.info("HomeCategoryController Bean加载完成，开始初始化首页数据");
