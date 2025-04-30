@@ -22,4 +22,6 @@ public class ServiceNameConstants
      */
     public static final String FILE_SERVICE = "ruoyi-file";
     public static final String DENTAL_SERVICE = "ruoyi-dental";
+
+    public static final String SMS_SERVICE = "ruoyi-sms";
 }

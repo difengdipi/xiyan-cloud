@@ -1,10 +1,13 @@
 package com.ruoyi.sms.controller;
 
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.security.annotation.InnerAuth;
+import com.ruoyi.sms.handler.SmsTypeFactory;
+import com.ruoyi.sms.inter.SmsComInterFace;
+import com.ruoyi.system.api.constants.SmsRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 /**
  * @Description: 用户短信发送接口
@@ -18,14 +21,23 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserSmsController {
 
+    @Autowired
+    SmsTypeFactory smsTypeFactory;
+
     /**
      * 给用户手机号发送就诊提示
-     * @param param
      * @param phone
+     * @param request
      * @return
      */
-    @GetMapping("/sendUserApp/{phone}")
-    public R<Boolean> sendUserApp(@RequestParam Map<String, Object> param, @PathVariable("phone") String phone){
+    @PostMapping("/sendUserApp/{phone}")
+    @InnerAuth
+    public R sendUserApp(@PathVariable("phone") String phone, @RequestBody SmsRequest request){
+        SmsComInterFace sms =  smsTypeFactory.getSms(request.getType());
+        return sms.sendSms(phone, request.getParam());
+    }
+    @GetMapping("/sendAllUserApp")
+    public R<Boolean> sendAllUserApp(@RequestParam String phone){
         return null;
     }
 }

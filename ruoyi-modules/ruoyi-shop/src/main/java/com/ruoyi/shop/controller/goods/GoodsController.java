@@ -230,7 +230,7 @@ public class GoodsController extends BaseController {
      * @return
      */
     @PostMapping("/getGoodsBySkus")
-    public R selectBySkus(@RequestBody Long[] ids){
+    public R selectBySkus(@RequestBody Long[] ids) {
         return null;
     }
 }

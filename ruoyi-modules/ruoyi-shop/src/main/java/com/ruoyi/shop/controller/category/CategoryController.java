@@ -81,7 +81,7 @@ public class CategoryController {
     @Operation(summary = "修改分类数据")
     @PutMapping(value = "/updateCategory")
     public R updateCategory(@RequestBody Category category) {
-        boolean flag = categoryService.updateById(category);
+        boolean flag = categoryService.update(category, new LambdaQueryWrapper<Category>().eq(Category::getCategoryId, category.getCategoryId()));
         if (flag) {
             return R.ok("修改分类成功");
         } else {
